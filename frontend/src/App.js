@@ -4,19 +4,15 @@ import UserInput from './components/UserInput';
 import './App.css';
 
 const App = () => {
-  const [backendData, setBackendData] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
     fetch('/api')
       .then((response) => response.json())
-      .then((data) => setBackendData(data.backendTasks));
-  }, []); // This is my data fetch.
-
-  const [tasks, setTasks] = useState([]);
-
-  useEffect(() => {
-    setTasks(backendData);
-  }, [backendData]); // So it should render everytime that backendData is fetched... So Ideally once.
+      .then((data) => {
+        setTasks(data.backendTasks);
+      });
+  }, []);
 
   const sortedTasks = [...tasks].sort(
     (taskA, taskB) => new Date(taskA.date) - new Date(taskB.date)
@@ -36,7 +32,7 @@ const App = () => {
   };
 
   return (
-    <div className="">
+    <div>
       <UserInput onAddTask={onSubmitHandler} />
       <ListResults tasks={sortedTasks} onDeleteItem={onDeleteItemHandler} />
     </div>

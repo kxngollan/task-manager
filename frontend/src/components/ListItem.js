@@ -3,6 +3,7 @@ import './ListItem.css';
 
 const ListItem = (props) => {
   const [complete, setComplete] = useState(false);
+
   const onDelete = () => {
     props.deleteHandler(props.id);
   };

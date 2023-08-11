@@ -1,4 +1,3 @@
-// ListResults.js
 import React from 'react';
 import ListItem from './ListItem';
 
@@ -11,6 +10,7 @@ const ListResults = (props) => {
         {props.tasks.map((task) => (
           <ListItem
             key={task.id}
+            id={task.id}
             date={new Date(task.date).toDateString()}
             title={task.title}
             description={task.description}

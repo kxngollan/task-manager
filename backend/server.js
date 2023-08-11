@@ -14,7 +14,7 @@ app.get('/api', (req, res) => {
     {
       title: 'See Mum',
       date: '2023-08-03T00:00:00.000Z',
-      description: 'Go on a walk to the park with her.',
+      description: 'Take her on a walk to the park.',
       id: '0.9103136998514578',
     },
     {
