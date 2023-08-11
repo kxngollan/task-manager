@@ -11,7 +11,7 @@ const ListResults = (props) => {
         {props.tasks.map((task) => (
           <ListItem
             key={task.id}
-            date={task.date.toDateString()}
+            date={new Date(task.date).toDateString()}
             title={task.title}
             description={task.description}
             deleteHandler={props.onDeleteItem}

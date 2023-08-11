@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const UserInput = (props) => {
   const [myTask, setMyTask] = useState('');
@@ -22,7 +22,7 @@ const UserInput = (props) => {
 
     const taskData = {
       title: myTask,
-      date: new Date(theDate),
+      date: theDate,
       description: myDescription,
       id: Math.random().toString(),
     };
