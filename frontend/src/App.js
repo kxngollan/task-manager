@@ -12,9 +12,7 @@ const App = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
-        'https://react-list-fcbff-default-rtdb.firebaseio.com/list.json'
-      );
+      const response = await fetch('/api');
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
@@ -47,18 +45,16 @@ const App = () => {
     (taskA, taskB) => new Date(taskA.date) - new Date(taskB.date)
   );
 
+  //Submission
   const onSubmitHandler = async (task) => {
     try {
-      const response = await fetch(
-        'https://react-list-fcbff-default-rtdb.firebaseio.com/list.json',
-        {
-          method: 'POST',
-          body: JSON.stringify(task),
-          headers: {
-            'content-type': 'application/json',
-          },
-        }
-      );
+      const response = await fetch('/api/add', {
+        method: 'POST',
+        body: JSON.stringify(task),
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
 
       if (!response.ok) {
         throw new Error('Failed to add task.');
@@ -67,12 +63,13 @@ const App = () => {
       const data = await response.json();
       console.log(data);
 
-      setTasks((prevTasks) => [task, ...prevTasks]);
+      fetchData(); // Fetch updated data after adding
     } catch (error) {
       setError(error.message);
     }
   };
 
+  //Deletion
   const onDeleteItemHandler = (taskId) => {
     setTasks((prevTasks) => {
       let updatedTasks = prevTasks.filter((task) => task.id !== taskId);
