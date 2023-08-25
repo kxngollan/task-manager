@@ -56,4 +56,53 @@ app.post('/api/add', async (req, res) => {
   }
 });
 
+app.delete('/api/delete', async (req, res) => {
+  try {
+    const itemId = req.body.id;
+
+    const listDelete = await List.deleteOne({ id: itemId }).exec();
+
+    if (listDelete.deletedCount === 1) {
+      console.log('Item deleted:', itemId);
+      res.status(204).send();
+    } else {
+      console.log('Item not found:', itemId);
+      res.status(404).json({ error: 'Item not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting item:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.put('/api/update', async (req, res) => {
+  try {
+    let itemId = req.query.id;
+    let itemStatus = '';
+    let newStatus = '';
+
+    if (itemStatus === 'Pending') {
+      newStatus = 'Complete';
+    } else {
+      newStatus = 'Pending';
+    }
+
+    const ListUpdate = await List.updateOne(
+      { id: itemId },
+      { status: newStatus }
+    );
+
+    if (ListUpdate.modifiedCount === 1) {
+      console.log('Update successful');
+      res.status(200).json({ message: 'Update successful' });
+    } else {
+      console.log('No document was modified');
+      res.status(200).json({ message: 'No document was modified' });
+    }
+  } catch (error) {
+    console.error('Error updating item:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

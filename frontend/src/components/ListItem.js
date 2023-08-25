@@ -1,16 +1,16 @@
-import { useState } from 'react';
 import './ListItem.css';
 
 const ListItem = (props) => {
-  const [complete, setComplete] = useState(false);
-
   const onDelete = () => {
     props.deleteHandler(props.id);
+    console.log(props.id);
   };
-  const onComplete = () => {
-    setComplete(!complete);
+
+  const onUpdate = () => {
+    props.updateHandler(props.status);
   };
-  if (complete) {
+
+  if (props.status === 'Pending') {
     return (
       <div className="list" style={{ background: 'green' }}>
         <h1>{props.title}</h1>
@@ -20,7 +20,7 @@ const ListItem = (props) => {
           Delete
         </button>
         <br />
-        <button className="btn" onClick={onComplete}>
+        <button className="btn" onClick={onUpdate}>
           Complete
         </button>
       </div>
@@ -33,7 +33,7 @@ const ListItem = (props) => {
         <p>{props.description}</p>
         <button onClick={onDelete}>Delete</button>
         <br />
-        <button onClick={onComplete}>pending</button>
+        <button onClick={onUpdate}>pending</button>
       </div>
     );
   }

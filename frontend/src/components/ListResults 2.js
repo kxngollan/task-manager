@@ -8,13 +8,15 @@ const ListResults = (props) => {
   } else {
     return (
       <ul>
-        {props.tasks.map((taskArray) => (
+        {props.tasks.map((sortedTasks) => (
           <ListItem
-            id={taskArray.id}
-            date={taskArray.date.toDateString()}
-            title={taskArray.title}
-            description={taskArray.description}
+            id={sortedTasks.id}
+            date={sortedTasks.date.toDateString()}
+            title={sortedTasks.title}
+            description={sortedTasks.description}
+            status={sortedTasks.status}
             deleteHandler={props.onDeleteItem}
+            updateHandler={props.onUpdateItem}
           />
         ))}
       </ul>

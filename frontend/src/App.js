@@ -22,10 +22,11 @@ const App = () => {
 
       for (const key in data) {
         myList.push({
-          id: key,
+          id: data[key].id,
           title: data[key].title,
           description: data[key].description,
           date: data[key].date,
+          status: data[key].status,
         });
       }
 
@@ -63,25 +64,59 @@ const App = () => {
       const data = await response.json();
       console.log(data);
 
-      fetchData(); // Fetch updated data after adding
+      fetchData();
+    } catch (error) {
+      setError(error.message);
+    }
+    console.log(tasks);
+  };
+
+  //Deletion
+  const onDeleteItemHandler = async (taskId) => {
+    console.log(taskId);
+    try {
+      const response = await fetch('/api/delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: taskId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete task.');
+      }
+
+      console.log('Item deleted:', taskId);
+      fetchData();
     } catch (error) {
       setError(error.message);
     }
   };
 
-  //Deletion
-  const onDeleteItemHandler = (taskId) => {
-    setTasks((prevTasks) => {
-      let updatedTasks = prevTasks.filter((task) => task.id !== taskId);
-      return updatedTasks;
-    });
-  };
+  //Update Status
+  const onUpdateItemHandler = async(taskStatus, taskId) => {
+    try {
+      const response = await fetch('/api/delete', {
+        method: "UPDATE",
+         headers: {
+          'Content-Type': 'application/json',
+        },
+        body:JSON.stringify({id: taskId, status: taskStatus})
+      })
+    }
+  }
 
   return (
     <div>
       <UserInput onAddTask={onSubmitHandler} />
       {!loading && (
-        <ListResults tasks={sortedTasks} onDeleteItem={onDeleteItemHandler} />
+        <ListResults
+          tasks={sortedTasks}
+          onDeleteItem={onDeleteItemHandler}
+          onUpdateItem={onUpdateItemHandler}
+        />
       )}
       {!loading && error && <h2>{error}</h2>}
       {loading && <h2>Loading...</h2>}
