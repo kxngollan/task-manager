@@ -25,6 +25,7 @@ const UserInput = (props) => {
       date: theDate,
       description: myDescription,
       id: Math.random().toString(),
+      status: 'Pending',
     };
 
     props.onAddTask(taskData);
