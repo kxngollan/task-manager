@@ -11,23 +11,21 @@ const ListItem = (props) => {
 
   return (
     <div
-      className={`list ${props.listStatus === 'Complete' ? 'complete' : ''}`}
+      style={{
+        background: props.listStatus === 'Complete' ? 'green' : '',
+      }}
     >
       <h1>{props.title}</h1>
       <p>{props.date}</p>
       <p>{props.description}</p>
-      <button className="btn" onClick={onDelete}>
-        Delete
-      </button>
+      <button onClick={onDelete}>Delete</button>
       <br />
       {props.listStatus === 'Complete' ? (
-        <button className="btn" onClick={onUpdateStatus} disabled>
+        <button onClick={onUpdateStatus} disabled>
           Complete
         </button>
       ) : (
-        <button className="btn" onClick={onUpdateStatus}>
-          Complete
-        </button>
+        <button onClick={onUpdateStatus}>Complete</button>
       )}
     </div>
   );
