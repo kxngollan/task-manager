@@ -1,42 +1,36 @@
-import './ListItem.css';
+import React from 'react';
 
 const ListItem = (props) => {
   const onDelete = () => {
     props.deleteHandler(props.id);
-    console.log(props.id);
   };
 
-  const onUpdate = () => {
-    props.updateHandler(props.status);
+  const onUpdateStatus = () => {
+    props.updateHandler(props.id, 'Complete');
   };
 
-  if (props.status === 'Pending') {
-    return (
-      <div className="list" style={{ background: 'green' }}>
-        <h1>{props.title}</h1>
-        <p>{props.date}</p>
-        <p>{props.description}</p>
-        <button className="btn" onClick={onDelete}>
-          Delete
-        </button>
-        <br />
-        <button className="btn" onClick={onUpdate}>
+  return (
+    <div
+      className={`list ${props.listStatus === 'Complete' ? 'complete' : ''}`}
+    >
+      <h1>{props.title}</h1>
+      <p>{props.date}</p>
+      <p>{props.description}</p>
+      <button className="btn" onClick={onDelete}>
+        Delete
+      </button>
+      <br />
+      {props.listStatus === 'Complete' ? (
+        <button className="btn" onClick={onUpdateStatus} disabled>
           Complete
         </button>
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <h1>{props.title}</h1>
-        <p>{props.date}</p>
-        <p>{props.description}</p>
-        <button onClick={onDelete}>Delete</button>
-        <br />
-        <button onClick={onUpdate}>pending</button>
-      </div>
-    );
-  }
+      ) : (
+        <button className="btn" onClick={onUpdateStatus}>
+          Complete
+        </button>
+      )}
+    </div>
+  );
 };
 
 export default ListItem;

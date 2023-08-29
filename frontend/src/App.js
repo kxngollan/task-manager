@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ListResults from './components/ListResults';
 import UserInput from './components/UserInput';
 import './App.css';
@@ -8,6 +8,7 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  //Fetch all Task from Express
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -18,17 +19,13 @@ const App = () => {
       }
       const data = await response.json();
 
-      const myList = [];
-
-      for (const key in data) {
-        myList.push({
-          id: data[key].id,
-          title: data[key].title,
-          description: data[key].description,
-          date: data[key].date,
-          status: data[key].status,
-        });
-      }
+      const myList = Object.keys(data).map((key) => ({
+        id: data[key].id,
+        title: data[key].title,
+        description: data[key].description,
+        date: data[key].date,
+        listStatus: data[key].status,
+      }));
 
       setTasks(myList);
       setLoading(false);
@@ -42,11 +39,7 @@ const App = () => {
     fetchData();
   }, [fetchData]);
 
-  const sortedTasks = [...tasks].sort(
-    (taskA, taskB) => new Date(taskA.date) - new Date(taskB.date)
-  );
-
-  //Submission
+  // Add a new item
   const onSubmitHandler = async (task) => {
     try {
       const response = await fetch('/api/add', {
@@ -58,22 +51,19 @@ const App = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add task.');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add task.');
       }
 
-      const data = await response.json();
-      console.log(data);
-
+      await response.json(); // No need to store the data in this case
       fetchData();
     } catch (error) {
       setError(error.message);
     }
-    console.log(tasks);
   };
 
-  //Deletion
+  // Delete an item
   const onDeleteItemHandler = async (taskId) => {
-    console.log(taskId);
     try {
       const response = await fetch('/api/delete', {
         method: 'DELETE',
@@ -88,36 +78,46 @@ const App = () => {
         throw new Error(errorData.error || 'Failed to delete task.');
       }
 
-      console.log('Item deleted:', taskId);
       fetchData();
     } catch (error) {
       setError(error.message);
     }
   };
 
-  //Update Status
-  const onUpdateItemHandler = async(taskStatus, taskId) => {
+  // Update item status
+  const onUpdateItemHandler = async (taskStatus, taskId) => {
     try {
-      const response = await fetch('/api/delete', {
-        method: "UPDATE",
-         headers: {
+      const response = await fetch('/api/update', {
+        method: 'PUT',
+        headers: {
           'Content-Type': 'application/json',
         },
-        body:JSON.stringify({id: taskId, status: taskStatus})
-      })
+        body: JSON.stringify({ id: taskId, status: taskStatus }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update task.');
+      }
+
+      fetchData();
+    } catch (error) {
+      setError(error.message);
     }
-  }
+  };
 
   return (
     <div>
       <UserInput onAddTask={onSubmitHandler} />
+
       {!loading && (
         <ListResults
-          tasks={sortedTasks}
+          tasks={tasks}
           onDeleteItem={onDeleteItemHandler}
           onUpdateItem={onUpdateItemHandler}
         />
       )}
+
       {!loading && error && <h2>{error}</h2>}
       {loading && <h2>Loading...</h2>}
     </div>

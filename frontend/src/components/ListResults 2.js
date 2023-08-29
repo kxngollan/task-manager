@@ -1,4 +1,3 @@
-// ListResults.js
 import React from 'react';
 import ListItem from './ListItem';
 
@@ -8,15 +7,16 @@ const ListResults = (props) => {
   } else {
     return (
       <ul>
-        {props.tasks.map((sortedTasks) => (
+        {props.tasks.map((task) => (
           <ListItem
-            id={sortedTasks.id}
-            date={sortedTasks.date.toDateString()}
-            title={sortedTasks.title}
-            description={sortedTasks.description}
-            status={sortedTasks.status}
+            key={task.id}
+            id={task.id}
+            date={task.date.toDateString()}
+            title={task.title}
+            description={task.description}
+            listStatus={task.listStatus}
             deleteHandler={props.onDeleteItem}
-            updateHandler={props.onUpdateItem}
+            updateHandler={(status) => props.onUpdateItem(status, task.id)}
           />
         ))}
       </ul>
