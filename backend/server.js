@@ -47,10 +47,12 @@ app.post('/api/add', async (req, res) => {
       status: status,
     });
 
+    const newListItemId = newListItem.id;
+
     await newListItem.save();
 
-    console.log('Item added to ToDoList');
-    res.status(201).json({ message: 'Item added successfully' });
+    console.log('Item added to ToDoList: ' + newListItemId);
+    res.status(201).json({ message: 'Item added successfully:' });
   } catch (error) {
     console.error('Error adding to List:', error);
     res.status(500).json({ error: 'Internal server error' });

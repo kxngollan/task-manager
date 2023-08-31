@@ -37,27 +37,33 @@ const UserInput = (props) => {
 
   return (
     <form onSubmit={formSubmissionHandler}>
-      <label>Date</label>
+      <label>Date:</label>
+      <br />
       <input
         type="date"
         value={theDate}
         onChange={onDateChangeHandler}
         required
       />
-      <label>Title</label>
+      <br />
+      <label>Title:</label>
+      <br />
       <input
         type="text"
         value={myTask}
         onChange={onTitleChangeHandler}
         required
       />
-      <label>Description</label>
+      <br />
+      <label>Description:</label>
+      <br />
       <input
         type="text"
         value={myDescription}
         onChange={onDescriptionChangeHandler}
         required
       />
+      <br />
       <button type="submit">Submit</button>
     </form>
   );

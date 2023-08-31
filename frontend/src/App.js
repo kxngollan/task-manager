@@ -3,6 +3,30 @@ import ListResults from './components/ListResults';
 import UserInput from './components/UserInput';
 import './App.css';
 
+const dummyArray = [
+  {
+    date: '2023-08-01',
+    description: 'Watch love and basketball',
+    id: '0.5058451199981107',
+    listStatus: 'Pending',
+    title: 'Go cinema',
+  },
+  {
+    date: '2023-08-04',
+    description: 'Practice handles',
+    id: '0.7775269168910239',
+    listStatus: 'Pending',
+    title: 'Go to practice',
+  },
+  {
+    date: '2023-08-10',
+    description: 'Implement Databases to app',
+    id: '0.0005164424028314407',
+    other: 'Pending',
+    title: 'Learn react',
+  },
+];
+
 const App = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,7 +51,11 @@ const App = () => {
         listStatus: data[key].status,
       }));
 
-      setTasks(myList);
+      const sortedTasks = [...myList].sort(
+        (taskA, taskB) => new Date(taskA.date) - new Date(taskB.date)
+      );
+
+      setTasks(sortedTasks);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -55,7 +83,7 @@ const App = () => {
         throw new Error(errorData.error || 'Failed to add task.');
       }
 
-      await response.json(); // No need to store the data in this case
+      await response.json();
       fetchData();
     } catch (error) {
       setError(error.message);
@@ -64,24 +92,7 @@ const App = () => {
 
   // Delete an item
   const onDeleteItemHandler = async (taskId) => {
-    try {
-      const response = await fetch('/api/delete', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: taskId }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete task.');
-      }
-
-      fetchData();
-    } catch (error) {
-      setError(error.message);
-    }
+    console.log(tasks);
   };
 
   // Update item status
@@ -112,7 +123,7 @@ const App = () => {
 
       {!loading && (
         <ListResults
-          tasks={tasks}
+          tasks={dummyArray}
           onDeleteItem={onDeleteItemHandler}
           onUpdateItem={onUpdateItemHandler}
         />
