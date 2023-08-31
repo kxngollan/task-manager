@@ -3,30 +3,6 @@ import ListResults from './components/ListResults';
 import UserInput from './components/UserInput';
 import './App.css';
 
-const dummyArray = [
-  {
-    date: '2023-08-01',
-    description: 'Watch love and basketball',
-    id: '0.5058451199981107',
-    listStatus: 'Pending',
-    title: 'Go cinema',
-  },
-  {
-    date: '2023-08-04',
-    description: 'Practice handles',
-    id: '0.7775269168910239',
-    listStatus: 'Pending',
-    title: 'Go to practice',
-  },
-  {
-    date: '2023-08-10',
-    description: 'Implement Databases to app',
-    id: '0.0005164424028314407',
-    other: 'Pending',
-    title: 'Learn react',
-  },
-];
-
 const App = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -123,7 +99,7 @@ const App = () => {
 
       {!loading && (
         <ListResults
-          tasks={dummyArray}
+          tasks={tasks}
           onDeleteItem={onDeleteItemHandler}
           onUpdateItem={onUpdateItemHandler}
         />

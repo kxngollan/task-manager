@@ -4,10 +4,15 @@ const ListItem = (props) => {
   const onDelete = () => {
     props.deleteHandler(props.id);
   };
+
+  const onUpdate = () => {
+    props.updateHandler(props.myStatus, props.id);
+  };
+
   return (
     <div
       style={{
-        background: props.listStatus === 'Complete' ? 'green' : '',
+        background: props.myStatus === 'Complete' ? 'green' : '',
       }}
     >
       <h1>{props.title}</h1>
@@ -15,11 +20,7 @@ const ListItem = (props) => {
       <p>{props.description}</p>
       <button onClick={onDelete}>Delete</button>
       <br />
-      {props.listStatus !== 'Complete' ? (
-        <button onClick={props.updateHandler}>{props.myStatus}</button>
-      ) : (
-        <button onClick={props.updateHandler}>{props.listStatus}</button>
-      )}
+      <button onClick={onUpdate}>{props.myStatus}</button>
     </div>
   );
 };

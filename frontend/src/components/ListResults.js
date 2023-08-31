@@ -11,10 +11,12 @@ const ListResults = (props) => {
           <ListItem
             key={task.id}
             id={task.id}
+            myStatus={task.listStatus}
             date={new Date(task.date).toDateString()}
             title={task.title}
             description={task.description}
             deleteHandler={props.onDeleteItem}
+            updateHandler={props.onUpdateItem}
           />
         ))}
       </ul>
