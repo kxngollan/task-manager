@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import 'dotenv/config';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -9,6 +10,12 @@ const MONGODB = process.env.MONGODBURL;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(
+  cors({
+    origin: 'https://effortless-faun-f6a2e5.netlify.app/',
+    methods: 'GET,PUT,POST,DELETE',
+  })
+);
 
 mongoose.connect(MONGODB, {
   useNewUrlParser: true,

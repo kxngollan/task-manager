@@ -13,7 +13,9 @@ const App = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api');
+      const response = await fetch(
+        'https://fullstack-list-backend.onrender.com/api'
+      );
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
@@ -46,13 +48,16 @@ const App = () => {
   // Add a new item
   const onSubmitHandler = async (task) => {
     try {
-      const response = await fetch('/api/add', {
-        method: 'POST',
-        body: JSON.stringify(task),
-        headers: {
-          'content-type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        'https://fullstack-list-backend.onrender.com/api/add',
+        {
+          method: 'POST',
+          body: JSON.stringify(task),
+          headers: {
+            'content-type': 'application/json',
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -74,13 +79,16 @@ const App = () => {
   // Update item status
   const onUpdateItemHandler = async (taskStatus, taskId) => {
     try {
-      const response = await fetch('/api/update', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: taskId, status: taskStatus }),
-      });
+      const response = await fetch(
+        'https://fullstack-list-backend.onrender.com/api/update',
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: taskId, status: taskStatus }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
