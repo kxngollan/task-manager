@@ -73,7 +73,25 @@ const App = () => {
 
   // Delete an item
   const onDeleteItemHandler = async (taskId) => {
-    console.log(tasks);
+    try {
+      const response = await fetch(
+        'https://fullstack-list-backend.onrender.com/api/delete',
+        {
+          method: 'DELETE',
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({ id: taskId }),
+        }
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete task.');
+      }
+      fetchData();
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   // Update item status
