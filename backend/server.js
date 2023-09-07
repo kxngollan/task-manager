@@ -4,12 +4,13 @@ import 'dotenv/config';
 import bodyParser from 'body-parser';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
+const MONGODB = process.env.MONGODBURL;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-mongoose.connect('mongodb://localhost:27017/myList', {
+mongoose.connect(MONGODB, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
