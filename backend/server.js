@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
   cors({
-    origin: 'https://effortless-faun-f6a2e5.netlify.app/',
+    origin: 'https://effortless-faun-f6a2e5.netlify.app',
     methods: 'GET,PUT,POST,DELETE',
   })
 );
