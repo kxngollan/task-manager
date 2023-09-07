@@ -4,7 +4,7 @@ import 'dotenv/config';
 import bodyParser from 'body-parser';
 
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 const MONGODB = process.env.MONGODBURL;
 
 app.use(bodyParser.urlencoded({ extended: true }));
