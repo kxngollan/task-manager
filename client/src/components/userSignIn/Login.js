@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Login = () => {
+const Login = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -39,7 +39,7 @@ const Login = () => {
         value={password}
       />
       <button type="submit">Login</button>
-      <button>Don't have an account</button>
+      <button onClick={props.loginSwitch}>Don't have an account</button>
     </form>
   );
 };

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import ListResults from '../components/ListResults';
-import UserInput from './components/UserInput';
-import './App.css';
+import ListResults from '../components/ToDoItems/ListResults';
+import UserInput from '../components/ToDoItems/UserInput';
 
 const UserData = () => {
   const [tasks, setTasks] = useState([]);

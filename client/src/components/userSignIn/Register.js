@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
-const Register = () => {
+const Register = (props) => {
   const [fName, setFName] = useState('');
   const [lName, setLName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [password2, setPassword2] = useState('');
 
   const fNameChangeHandler = (event) => {
     setFName(event.target.value);
@@ -22,8 +23,15 @@ const Register = () => {
     setPassword(event.target.value);
   };
 
+  const password2ChangeHandler = (event) => {
+    setPassword2(event.target.value);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (password !== password2) {
+      return console.log("Password doesn't match");
+    }
   };
 
   return (
@@ -66,8 +74,18 @@ const Register = () => {
         onChange={passwordChangeHandler}
         value={password}
       />
+      <label htmlFor="password2">Re-enter Password</label>
+      <input
+        type="password"
+        name="password2"
+        placeholder="password"
+        id="password2"
+        required
+        onChange={password2ChangeHandler}
+        value={password2}
+      />
       <button type="submit">Register</button>
-      <button>Already have an account</button>
+      <button onClick={props.loginSwitch}>Already have an account</button>
     </form>
   );
 };

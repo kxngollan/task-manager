@@ -1,9 +1,10 @@
-import './App.css';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import SignIn from './pages/SignIn';
-import ToDoLst from './pages/ToDoList';
+import ToDoList from './pages/ToDoList';
+import HomePage from './pages/HomePage';
 
 const routers = createBrowserRouter([
+  { path: '/', element: <HomePage /> },
   { path: '/signin', element: <SignIn /> },
   { path: '/ToDoList', element: <ToDoList /> },
 ]);
