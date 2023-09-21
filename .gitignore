@@ -1,4 +1,6 @@
-frontend/node_modules
-backend/node_modules
-backend/.env
-.DS_Store
+client/node_modules
+client/.DS_Store
+client/src/.DS_Store
+server/node_modules
+server/.env
+server/.DS_Store

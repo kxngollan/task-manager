@@ -1,4 +1,6 @@
-const login = () => {
+import React, { useState } from 'react';
+
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -10,9 +12,13 @@ const login = () => {
     setPassword(event.target.value);
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+  };
+
   return (
-    <form>
-      <label for="email">email</label>
+    <form onSubmit={handleSubmit}>
+      <label htmlFor="email">Email</label>
       <input
         type="email"
         name="email"
@@ -22,7 +28,7 @@ const login = () => {
         onChange={emailChangeHandler}
         value={email}
       />
-      <label for="password">Password</label>
+      <label htmlFor="password">Password</label>
       <input
         type="password"
         name="password"
@@ -32,10 +38,10 @@ const login = () => {
         onChange={passwordChangeHandler}
         value={password}
       />
-      <button>Login</button>
+      <button type="submit">Login</button>
       <button>Don't have an account</button>
     </form>
   );
 };
 
-export default login;
+export default Login;
