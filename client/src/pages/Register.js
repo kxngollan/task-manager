@@ -99,7 +99,9 @@ const Register = (props) => {
         value={password2}
       />
       <button type="submit">Register</button>
-      <button onClick={props.loginSwitch}>Already have an account</button>
+      <button>
+        <Link to="/login">Already have an account</Link>
+      </button>
     </form>
   );
 };

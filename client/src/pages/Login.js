@@ -39,7 +39,9 @@ const Login = (props) => {
         value={password}
       />
       <button type="submit">Login</button>
-      <button onClick={props.loginSwitch}>Don't have an account</button>
+      <button>
+        <Link to="/register">Don't have an account</Link>
+      </button>
     </form>
   );
 };

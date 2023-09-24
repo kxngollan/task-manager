@@ -1,11 +1,13 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import SignIn from './pages/SignIn';
 import ToDoList from './pages/ToDoList';
 import HomePage from './pages/HomePage';
+import Login from './components/userSignIn/Login';
+import Register from './components/userSignIn/Register';
 
 const routers = createBrowserRouter([
   { path: '/', element: <HomePage /> },
-  { path: '/signin', element: <SignIn /> },
+  { path: '/login', element: <Login /> },
+  { path: '/register', element: <Register /> },
   { path: '/todolist', element: <ToDoList /> },
 ]);
 
