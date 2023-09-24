@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 
 const Register = (props) => {
-  const [fName, setFName] = useState('');
+  const [fName, setFName] = useState();
   const [lName, setLName] = useState('');
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
 
@@ -13,6 +14,10 @@ const Register = (props) => {
 
   const lNameChangeHandler = (event) => {
     setLName(event.target.value);
+  };
+
+  const usernameChangeHandler = (event) => {
+    setUsername(event.target.value);
   };
 
   const emailChangeHandler = (event) => {
@@ -47,12 +52,21 @@ const Register = (props) => {
       />
       <label htmlFor="lName">Last Name</label>
       <input
-        type=""
+        type="text"
         name="lName"
         placeholder="Last Name"
         required
         onChange={lNameChangeHandler}
         value={lName}
+      />
+      <label htmlFor="username">username</label>
+      <input
+        type="text"
+        name="username"
+        placeholder="username"
+        required
+        onChange={usernameChangeHandler}
+        value={username}
       />
       <label htmlFor="email">Email</label>
       <input

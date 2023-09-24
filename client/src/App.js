@@ -6,7 +6,7 @@ import HomePage from './pages/HomePage';
 const routers = createBrowserRouter([
   { path: '/', element: <HomePage /> },
   { path: '/signin', element: <SignIn /> },
-  { path: '/ToDoList', element: <ToDoList /> },
+  { path: '/todolist', element: <ToDoList /> },
 ]);
 
 const App = () => {
