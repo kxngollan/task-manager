@@ -1,4 +1,5 @@
 import React from 'react';
+import ListDate from './ListDate';
 
 const ListItem = (props) => {
   const onDelete = () => {
@@ -11,16 +12,20 @@ const ListItem = (props) => {
 
   return (
     <div
+      className="list-item"
       style={{
         background: props.myStatus === 'Complete' ? 'green' : '',
       }}
     >
-      <h1>{props.title}</h1>
-      <p>{props.date}</p>
-      <p>{props.description}</p>
-      <button onClick={onDelete}>Delete</button>
-      <br />
-      <button onClick={onUpdate}>{props.myStatus}</button>
+      <ListDate date={props.date} />
+      <div>
+        <h1>{props.title}</h1>
+        <p>{props.description}</p>
+      </div>
+      <div>
+        <button onClick={onDelete}>Delete</button>
+        <button onClick={onUpdate}>{props.myStatus}</button>
+      </div>
     </div>
   );
 };

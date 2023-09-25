@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import './UserInput.css';
 
 const UserInput = (props) => {
   const [myTask, setMyTask] = useState('');
@@ -36,34 +37,34 @@ const UserInput = (props) => {
   };
 
   return (
-    <form onSubmit={formSubmissionHandler}>
-      <label>Date:</label>
-      <br />
-      <input
-        type="date"
-        value={theDate}
-        onChange={onDateChangeHandler}
-        required
-      />
-      <br />
-      <label>Title:</label>
-      <br />
-      <input
-        type="text"
-        value={myTask}
-        onChange={onTitleChangeHandler}
-        required
-      />
-      <br />
-      <label>Description:</label>
-      <br />
-      <input
-        type="text"
-        value={myDescription}
-        onChange={onDescriptionChangeHandler}
-        required
-      />
-      <br />
+    <form className="listuserinput" onSubmit={formSubmissionHandler}>
+      <div className="input-item">
+        <label>Date:</label>
+        <input
+          type="date"
+          value={theDate}
+          onChange={onDateChangeHandler}
+          required
+        />
+      </div>
+      <div className="input-item">
+        <label>Title:</label>
+        <input
+          type="text"
+          value={myTask}
+          onChange={onTitleChangeHandler}
+          required
+        />
+      </div>
+      <div className="input-item">
+        <label>Description:</label>
+        <input
+          type="text"
+          value={myDescription}
+          onChange={onDescriptionChangeHandler}
+          required
+        />
+      </div>
       <button type="submit">Submit</button>
     </form>
   );
