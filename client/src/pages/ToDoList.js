@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ListResults from '../components/ToDoItems/ListResults';
 import UserInput from '../components/UserInput/UserInput';
+import './ToDoList.css';
+
+const fetchURL = 'http://localhost:8000/api';
 
 const UserData = () => {
   const [tasks, setTasks] = useState([]);
@@ -12,9 +15,7 @@ const UserData = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
-        'https://fullstack-list-backend.onrender.com/api'
-      );
+      const response = await fetch(`${fetchURL}`);
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
@@ -24,7 +25,7 @@ const UserData = () => {
         id: data[key].id,
         title: data[key].title,
         description: data[key].description,
-        date: data[key].date,
+        date: new Date(data[key].date),
         listStatus: data[key].status,
       }));
 
@@ -47,16 +48,13 @@ const UserData = () => {
   // Add a new item
   const onSubmitHandler = async (task) => {
     try {
-      const response = await fetch(
-        'https://fullstack-list-backend.onrender.com/api/add',
-        {
-          method: 'POST',
-          body: JSON.stringify(task),
-          headers: {
-            'content-type': 'application/json',
-          },
-        }
-      );
+      const response = await fetch(`${fetchURL}/add`, {
+        method: 'POST',
+        body: JSON.stringify(task),
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -73,16 +71,13 @@ const UserData = () => {
   // Delete an item
   const onDeleteItemHandler = async (taskId) => {
     try {
-      const response = await fetch(
-        'https://fullstack-list-backend.onrender.com/api/delete',
-        {
-          method: 'DELETE',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify({ id: taskId }),
-        }
-      );
+      const response = await fetch(`${fetchURL}/delete`, {
+        method: 'DELETE',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ id: taskId }),
+      });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to delete task.');
@@ -96,16 +91,13 @@ const UserData = () => {
   // Update item status
   const onUpdateItemHandler = async (taskStatus, taskId) => {
     try {
-      const response = await fetch(
-        'https://fullstack-list-backend.onrender.com/api/update',
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ id: taskId, status: taskStatus }),
-        }
-      );
+      const response = await fetch(`${fetchURL}/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: taskId, status: taskStatus }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -121,17 +113,18 @@ const UserData = () => {
   return (
     <div>
       <UserInput onAddTask={onSubmitHandler} />
+      <div className="container">
+        {!loading && (
+          <ListResults
+            tasks={tasks}
+            onDeleteItem={onDeleteItemHandler}
+            onUpdateItem={onUpdateItemHandler}
+          />
+        )}
 
-      {!loading && (
-        <ListResults
-          tasks={tasks}
-          onDeleteItem={onDeleteItemHandler}
-          onUpdateItem={onUpdateItemHandler}
-        />
-      )}
-
-      {!loading && error && <h2>{error}</h2>}
-      {loading && <h2>Loading...</h2>}
+        {!loading && error && <h2>{error}</h2>}
+        {loading && <h2>Loading...</h2>}
+      </div>
     </div>
   );
 };

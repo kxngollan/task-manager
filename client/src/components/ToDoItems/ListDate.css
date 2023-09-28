@@ -11,6 +11,10 @@
   justify-content: center;
 }
 
+.list-date-complete {
+  background-color: #1a571c !important;
+}
+
 .list-date-month {
   font-size: 0.75rem;
   font-weight: bold;

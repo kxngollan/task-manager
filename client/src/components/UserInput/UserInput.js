@@ -20,6 +20,7 @@ const UserInput = (props) => {
 
   const formSubmissionHandler = (event) => {
     event.preventDefault();
+    console.log(theDate);
 
     const taskData = {
       title: myTask,
@@ -42,6 +43,8 @@ const UserInput = (props) => {
         <label>Date:</label>
         <input
           type="date"
+          min="2000-01-01"
+          max="2099-12-31"
           value={theDate}
           onChange={onDateChangeHandler}
           required

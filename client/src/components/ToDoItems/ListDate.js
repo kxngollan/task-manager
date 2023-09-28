@@ -2,12 +2,19 @@ import './ListDate.css';
 
 function ListDate(props) {
   const day = props.date.toLocaleString('en-US', { day: '2-digit' });
-  const month = props.date.toLocaleString('en-US', { month: 'long' });
+  const month = props.date.toLocaleString('en-US', { month: 'short' });
   const year = props.date.toLocaleString('en-US', { year: 'numeric' });
 
+  const taskStatus = props.taskStatus;
+
   return (
-    <div className="list-date">
-      <div className="lsit-date-day">{day}</div>
+    <div
+      className={
+        taskStatus === 'Complete' ? 'list-date list-date-complete' : 'list-date'
+      }
+      onClick={() => console.log(taskStatus)}
+    >
+      <div className="list-date-day">{day}</div>
       <div className="list-date-month">{month}</div>
       <div className="list-date-year">{year}</div>
     </div>
