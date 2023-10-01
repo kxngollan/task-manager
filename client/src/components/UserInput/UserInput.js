@@ -20,14 +20,13 @@ const UserInput = (props) => {
 
   const formSubmissionHandler = (event) => {
     event.preventDefault();
-    console.log(theDate);
 
     const taskData = {
       title: myTask,
       date: theDate,
       description: myDescription,
       id: Math.random().toString(),
-      status: 'Pending',
+      listStatus: 'Pending',
     };
 
     props.onAddTask(taskData);

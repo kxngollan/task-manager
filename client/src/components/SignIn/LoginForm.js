@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import './SignIn.css';
+import Cookies from 'universal-cookie';
+// const cookies = new Cookies();
 
 const LoginForm = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [login, setLogin] = useState(false);
 
   const emailChangeHandler = (event) => {
     setEmail(event.target.value);
@@ -16,6 +20,27 @@ const LoginForm = (props) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const configuration = {
+      method: 'post',
+      url: 'http://localhost:8000/login',
+      data: {
+        email,
+        password,
+      },
+    };
+
+    // axios(configuration)
+    //   .then((result) => {
+    //     cookies.set('TOKEN', result.data.token, {
+    //       path: '/',
+    //     });
+    //     window.location.href = '/todolist';
+
+    //     setLogin(true);
+    //   })
+    //   .catch((error) => {
+    //     error = new Error();
+    //   });
   };
 
   return (
