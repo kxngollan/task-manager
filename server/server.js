@@ -23,25 +23,21 @@ mongoose.connect(MONGODB, {
 });
 
 const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: [true, 'Please provide an Email!'],
-    unique: [true, 'Email Exist'],
-  },
+  email: String,
   password: String,
 });
 
 const User = mongoose.model('User', userSchema);
 
 app.post('/register', async (req, res) => {
-  const newUser = new User({
+  const userDetails = new User({
     email: req.body.email,
     password: req.body.password,
   });
   await newUser
     .save()
     .then(() => {
-      res.json(newUser);
+      res.json(userDetails);
     })
     .catch((err) => {
       res.status(500).json({ message: err.toString() });
@@ -49,7 +45,8 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  User.findOne({ email: req.body.email, password: req.body.password })
+  const userDetails = { email: req.body.email, password: req.body.password };
+  User.findOne(userDetails)
     .then((user) => {
       if (!user) {
         res.status(401).json({ message: 'failed to authenticate' });
@@ -57,7 +54,7 @@ app.post('/login', async (req, res) => {
       }
 
       if (user) {
-        res.json({ user });
+        res.json({ userDetails });
       }
     })
     .catch((err) => {

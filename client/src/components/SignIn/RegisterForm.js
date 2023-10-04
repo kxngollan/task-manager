@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './SignIn.css';
 import axios from 'axios';
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
+
+const fetchURL = 'http://localhost:8000';
 
 const RegisterForm = (props) => {
   const [register, setRegister] = useState(false);
@@ -40,7 +44,7 @@ const RegisterForm = (props) => {
     } else {
       const configuration = {
         method: 'post',
-        url: 'http://localhost:8000/register',
+        url: `${fetchURL}/register`,
         data: {
           email,
           password,
@@ -49,6 +53,11 @@ const RegisterForm = (props) => {
 
       axios(configuration)
         .then((result) => {
+          cookies.set('TOKEN', result.data.token, {
+            path: '/register',
+          });
+          window.location.href = '/todolist';
+
           setRegister(true);
         })
         .catch((error) => {

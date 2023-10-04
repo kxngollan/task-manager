@@ -2,6 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import ListResults from '../components/ToDoItems/ListResults';
 import UserInput from '../components/UserInput/UserInput';
 import './ToDoList.css';
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
+
+const userEmail = token.email;
 
 const fetchURL = 'http://localhost:8000/api';
 
@@ -110,9 +114,14 @@ const UserData = () => {
     }
   };
 
+  const logout = () => {
+    cookies.remove('TOKEN', { path: '/' });
+    window.location.href = '/';
+  };
+
   return (
     <div>
-      <UserInput onAddTask={onSubmitHandler} />
+      <UserInput onAddTask={onSubmitHandler} userEmail={userEmail} />
       <div className="container">
         {!loading && (
           <ListResults
@@ -127,7 +136,7 @@ const UserData = () => {
       </div>
       <div className="container">
         <div className="logout">
-          <button type="submit">Logout</button>
+          <button onClick={logout}>Logout</button>
         </div>
       </div>
     </div>
