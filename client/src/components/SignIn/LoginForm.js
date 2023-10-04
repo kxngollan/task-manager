@@ -2,18 +2,14 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './SignIn.css';
-import Cookies from 'universal-cookie';
-// const cookies = new Cookies();
 
 const LoginForm = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [login, setLogin] = useState(false);
-
   const emailChangeHandler = (event) => {
     setEmail(event.target.value);
   };
-
   const passwordChangeHandler = (event) => {
     setPassword(event.target.value);
   };
@@ -29,18 +25,14 @@ const LoginForm = (props) => {
       },
     };
 
-    // axios(configuration)
-    //   .then((result) => {
-    //     cookies.set('TOKEN', result.data.token, {
-    //       path: '/',
-    //     });
-    //     window.location.href = '/todolist';
-
-    //     setLogin(true);
-    //   })
-    //   .catch((error) => {
-    //     error = new Error();
-    //   });
+    axios(configuration)
+      .then((result) => {
+        window.location.href = '/todolist';
+        setLogin(true);
+      })
+      .catch((error) => {
+        error = new Error();
+      });
   };
 
   return (
@@ -52,7 +44,6 @@ const LoginForm = (props) => {
           name="email"
           placeholder="example@email.com"
           id="email"
-          required
           onChange={emailChangeHandler}
           value={email}
         />
@@ -64,7 +55,6 @@ const LoginForm = (props) => {
           name="password"
           placeholder="password"
           id="password"
-          required
           onChange={passwordChangeHandler}
           value={password}
         />
@@ -72,9 +62,14 @@ const LoginForm = (props) => {
       <button className="signinbutton" type="submit">
         Login
       </button>
-      <button className="signinbutton">
-        <Link to="/register">Don't have an account</Link>
-      </button>
+      <Link to="/register">
+        <button className="signinbutton">Don't have an account</button>
+      </Link>
+      {login ? (
+        <p className="text-success">You Are Logged in Successfully</p>
+      ) : (
+        <p className="text-danger">You Are Not Logged in</p>
+      )}
     </form>
   );
 };

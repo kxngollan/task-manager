@@ -47,3 +47,13 @@ div .signinform input {
   color: inherit;
   text-decoration: none;
 }
+
+.text-danger {
+  font-weight: 600;
+  color: red;
+}
+
+.text-success {
+  font-weight: 600;
+  color: #4caf50;
+}

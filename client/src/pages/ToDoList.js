@@ -2,9 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import ListResults from '../components/ToDoItems/ListResults';
 import UserInput from '../components/UserInput/UserInput';
 import './ToDoList.css';
-import axios from 'axios';
-import Cookies from 'universal-cookie';
-// const Cookies = new Cookies();
 
 const fetchURL = 'http://localhost:8000/api';
 
@@ -29,7 +26,7 @@ const UserData = () => {
         title: data[key].title,
         description: data[key].description,
         date: new Date(data[key].date),
-        listStatus: data[key].listStatus,
+        listStatus: data[key].status,
       }));
 
       const sortedTasks = [...myList].sort(
@@ -113,11 +110,6 @@ const UserData = () => {
     }
   };
 
-  // const logout = () => {
-  //   cookies.remove('TOKEN', { path: '/' });
-  //   window.location.href = '/';
-  // };
-
   return (
     <div>
       <UserInput onAddTask={onSubmitHandler} />
@@ -133,9 +125,11 @@ const UserData = () => {
         {!loading && error && <h2>{error}</h2>}
         {loading && <h2>Loading...</h2>}
       </div>
-      {/* <button type="submit" onClick={() => logout()}>
-        Logout
-      </button> */}
+      <div className="container">
+        <div className="logout">
+          <button type="submit">Logout</button>
+        </div>
+      </div>
     </div>
   );
 };

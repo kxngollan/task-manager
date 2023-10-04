@@ -7,7 +7,7 @@ import DemoList from './pages/DemoList';
 const routers = createBrowserRouter([
   { path: '/', element: <Login /> },
   { path: '/register', element: <Register /> },
-  // { path: '/todolist', element: <ToDoList /> },
+  { path: '/todolist', element: <ToDoList /> },
   { path: '/demolist', element: <DemoList /> },
 ]);
 

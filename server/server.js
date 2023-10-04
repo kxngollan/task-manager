@@ -2,18 +2,11 @@ import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
-import session from 'express-session';
-import passport from 'passport';
-import passportLocalMongoose from 'passport-local-mongoose';
 import cors from 'cors';
-import jwt from 'jsonwebtoken';
-import passportJwt from 'passport-jwt';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 const MONGODB = process.env.MONGODBURL;
-const JwtStrategy = passportJwt.Strategy;
-const ExtractJwt = passportJwt.ExtractJwt;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
@@ -24,104 +17,52 @@ app.use(
   })
 );
 
-app.use(
-  session({
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
-
 mongoose.connect(MONGODB, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 const userSchema = new mongoose.Schema({
-  email: String,
+  email: {
+    type: String,
+    required: [true, 'Please provide an Email!'],
+    unique: [true, 'Email Exist'],
+  },
   password: String,
 });
 
-userSchema.plugin(passportLocalMongoose);
-
 const User = mongoose.model('User', userSchema);
 
-passport.use(User.createStrategy());
-
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
-const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET,
-};
-
-passport.use(
-  new JwtStrategy(jwtOptions, (jwt_payload, done) => {
-    User.findById(jwt_payload.id, (err, user) => {
-      if (err) {
-        return done(err, false);
-      }
-      if (user) {
-        return done(null, user);
-      } else {
-        return done(null, false);
-      }
-    });
-  })
-);
-
-const generateToken = (user) => {
-  const payload = {
-    id: user._id,
-    email: user.email,
-  };
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-};
-
 app.post('/register', async (req, res) => {
-  User.register(
-    { email: req.body.email },
-    req.body.password,
-    function (err, user) {
-      if (err) {
-        console.log(err);
-        res.status(500).json({ error: err.message });
-      } else {
-        const token = generateToken(user);
-        res.json({ token });
-      }
-    }
-  );
-});
-
-app.post('/login', function (req, res) {
-  const user = new User({
+  const newUser = new User({
     email: req.body.email,
     password: req.body.password,
   });
-
-  req.login(user, function (err) {
-    if (err) {
-      console.log(err);
-      res.status(500).json({ error: err.message });
-    } else {
-      passport.authenticate('local')(req, res, function () {
-        const token = generateToken(req.user);
-        res.json({ token });
-      });
-    }
-  });
+  await newUser
+    .save()
+    .then(() => {
+      res.json(newUser);
+    })
+    .catch((err) => {
+      res.status(500).json({ message: err.toString() });
+    });
 });
 
-// Protected Route Example
-const requireAuth = passport.authenticate('jwt', { session: false });
+app.post('/login', async (req, res) => {
+  User.findOne({ email: req.body.email, password: req.body.password })
+    .then((user) => {
+      if (!user) {
+        res.status(401).json({ message: 'failed to authenticate' });
+        return;
+      }
 
-app.get('/protected-route', requireAuth, (req, res) => {
-  res.json({ message: 'You are authenticated!' });
+      if (user) {
+        res.json({ user });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ message: err.toString() });
+    });
 });
 
 const listSchema = new mongoose.Schema({
@@ -137,9 +78,15 @@ const List = mongoose.model('List', listSchema);
 
 // Fetch all items
 app.get('/api', async (req, res) => {
-  const username = req.body.username;
+  const username = req.bo.username;
+  if (!username) {
+    return res
+      .status(403)
+      .json({ message: 'only logged in user can access this route' });
+  }
+
   try {
-    const allItems = await List.find();
+    const allItems = await List.find({ username });
     res.json(allItems);
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -149,10 +96,17 @@ app.get('/api', async (req, res) => {
 
 // Add a new item
 app.post('/api/add', async (req, res) => {
+  const username = req.query.username;
+  if (!username) {
+    return res
+      .status(403)
+      .json({ message: 'only logged in user can access this route' });
+  }
+
   try {
     const { user, title, description, date, id, status } = req.body;
     const newListItem = new List({
-      user: user,
+      user: username,
       title: title,
       description: description,
       date: date,
