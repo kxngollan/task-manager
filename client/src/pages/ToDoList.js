@@ -2,8 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import ListResults from '../components/ToDoItems/ListResults';
 import UserInput from '../components/UserInput/UserInput';
 import './ToDoList.css';
+import Cookies from 'universal-cookie';
 
 const fetchURL = 'http://localhost:8000/api';
+
+const cookies = new Cookies();
+const token = cookies.get('TOKEN');
 
 const UserData = () => {
   const [tasks, setTasks] = useState([]);
@@ -15,7 +19,7 @@ const UserData = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${fetchURL}`);
+      const response = await fetch(`${fetchURL}/user?email=${token.email}`);
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
@@ -25,7 +29,7 @@ const UserData = () => {
         id: data[key].id,
         title: data[key].title,
         description: data[key].description,
-        date: new Date(data[key].date),
+        date: data[key].date,
         listStatus: data[key].status,
       }));
 
@@ -44,9 +48,9 @@ const UserData = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
   // Add a new item
   const onSubmitHandler = async (task) => {
+    console.log(task);
     try {
       const response = await fetch(`${fetchURL}/add`, {
         method: 'POST',
@@ -110,9 +114,14 @@ const UserData = () => {
     }
   };
 
+  const logout = () => {
+    cookies.remove('TOKEN', { path: '/' });
+    window.location.href = '/';
+  };
+
   return (
     <div>
-      <UserInput onAddTask={onSubmitHandler} />
+      <UserInput onAddTask={onSubmitHandler} userEmail={token.email} />
       <div className="container">
         {!loading && (
           <ListResults
@@ -127,7 +136,7 @@ const UserData = () => {
       </div>
       <div className="container">
         <div className="logout">
-          <button type="submit">Logout</button>
+          <button onClick={logout}>Logout</button>
         </div>
       </div>
     </div>

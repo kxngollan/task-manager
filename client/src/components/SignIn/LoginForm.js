@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './SignIn.css';
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
 
 const LoginForm = (props) => {
   const [email, setEmail] = useState('');
@@ -27,6 +30,9 @@ const LoginForm = (props) => {
 
     axios(configuration)
       .then((result) => {
+        cookies.set('TOKEN', result.data.user, {
+          path: '/',
+        });
         window.location.href = '/todolist';
         setLogin(true);
       })

@@ -34,14 +34,14 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 app.post('/register', async (req, res) => {
-  const newUser = new User({
+  const user = new User({
     email: req.body.email,
     password: req.body.password,
   });
-  await newUser
+  user
     .save()
     .then(() => {
-      res.json(newUser);
+      res.json({ user });
     })
     .catch((err) => {
       res.status(500).json({ message: err.toString() });
@@ -49,7 +49,9 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  User.findOne({ email: req.body.email, password: req.body.password })
+  const loggedInUser = { email: req.body.email, password: req.body.password };
+
+  User.findOne(loggedInUser)
     .then((user) => {
       if (!user) {
         res.status(401).json({ message: 'failed to authenticate' });
@@ -66,7 +68,7 @@ app.post('/login', async (req, res) => {
 });
 
 const listSchema = new mongoose.Schema({
-  user: String,
+  email: String,
   title: String,
   description: String,
   date: String,
@@ -77,36 +79,33 @@ const listSchema = new mongoose.Schema({
 const List = mongoose.model('List', listSchema);
 
 // Fetch all items
-app.get('/api', async (req, res) => {
-  const username = req.bo.username;
-  if (!username) {
-    return res
-      .status(403)
-      .json({ message: 'only logged in user can access this route' });
-  }
+app.get('/api/user', (req, res) => {
+  const email = req.query.email;
 
-  try {
-    const allItems = await List.find({ username });
-    res.json(allItems);
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+  User.findOne({ email: email })
+    .then((user) => {
+      if (!user) {
+        return res
+          .status(403)
+          .json({ message: 'Only logged in user can access this route' });
+      }
+
+      return List.find({ email: email });
+    })
+    .then((allItems) => {
+      res.send(allItems);
+    })
+    .catch((error) => {
+      res.status(500).json({ message: error.message });
+    });
 });
 
 // Add a new item
 app.post('/api/add', async (req, res) => {
-  const username = req.query.username;
-  if (!username) {
-    return res
-      .status(403)
-      .json({ message: 'only logged in user can access this route' });
-  }
-
   try {
-    const { user, title, description, date, id, status } = req.body;
+    const { email, title, description, date, id, status } = req.body;
     const newListItem = new List({
-      user: username,
+      email: email,
       title: title,
       description: description,
       date: date,

@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './SignIn.css';
 import axios from 'axios';
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
+
+const fetchURL = 'http://localhost:8000';
 
 const RegisterForm = (props) => {
   const [register, setRegister] = useState(false);
@@ -40,7 +45,7 @@ const RegisterForm = (props) => {
     } else {
       const configuration = {
         method: 'post',
-        url: 'http://localhost:8000/register',
+        url: `${fetchURL}/register`,
         data: {
           email,
           password,
@@ -50,6 +55,10 @@ const RegisterForm = (props) => {
       axios(configuration)
         .then((result) => {
           setRegister(true);
+          cookies.set('TOKEN', result.data.user, {
+            path: '/',
+          });
+          window.location.href = '/todolist';
         })
         .catch((error) => {
           error = new Error();
@@ -58,61 +67,59 @@ const RegisterForm = (props) => {
   };
 
   return (
-    <>
-      <form className="signin" onSubmit={handleSubmit}>
-        <div className="signinform">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            name="email"
-            placeholder="example@email.com"
-            id="email"
-            onChange={emailChangeHandler}
-            value={email}
-          />
-        </div>
-        <div className="signinform">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            name="password"
-            placeholder="password"
-            id="password"
-            onChange={passwordChangeHandler}
-            value={password}
-          />
-        </div>
-        <div className="signinform">
-          <label htmlFor="password2">Re-enter Password:</label>
-          <input
-            type="password"
-            name="password2"
-            placeholder="password"
-            id="password2"
-            onChange={password2ChangeHandler}
-            value={password2}
-          />
-          {!match ? (
-            <p className="text-danger">Passwords don't match</p>
-          ) : (
-            <p className="text-success">Passwords match</p>
-          )}
-        </div>
-        <button className="signinbutton" type="submit">
-          Register
-        </button>
-        <Link to="/">
-          <button className="signinbutton">Already have an account</button>
-        </Link>
-        {register ? (
-          <p className="text-success">
-            You Are Registered Successfully now go to login
-          </p>
+    <form className="signin" onSubmit={handleSubmit}>
+      <div className="signinform">
+        <label htmlFor="email">Email:</label>
+        <input
+          type="email"
+          name="email"
+          placeholder="example@email.com"
+          id="email"
+          onChange={emailChangeHandler}
+          value={email}
+        />
+      </div>
+      <div className="signinform">
+        <label htmlFor="password">Password:</label>
+        <input
+          type="password"
+          name="password"
+          placeholder="password"
+          id="password"
+          onChange={passwordChangeHandler}
+          value={password}
+        />
+      </div>
+      <div className="signinform">
+        <label htmlFor="password2">Re-enter Password:</label>
+        <input
+          type="password"
+          name="password2"
+          placeholder="password"
+          id="password2"
+          onChange={password2ChangeHandler}
+          value={password2}
+        />
+        {!match ? (
+          <p className="text-danger">Passwords don't match</p>
         ) : (
-          <p className="text-danger">You Are Not Registered please try again</p>
+          <p className="text-success">Passwords match</p>
         )}
-      </form>
-    </>
+      </div>
+      <button className="signinbutton" type="submit">
+        Register
+      </button>
+      <Link to="/">
+        <button className="signinbutton">Already have an account</button>
+      </Link>
+      {register ? (
+        <p className="text-success">
+          You Are Registered Successfully now go to login
+        </p>
+      ) : (
+        <p className="text-danger">You Are Not Registered please try again</p>
+      )}
+    </form>
   );
 };
 
