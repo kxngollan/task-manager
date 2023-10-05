@@ -4,7 +4,7 @@ import UserInput from '../components/UserInput/UserInput';
 import './ToDoList.css';
 import Cookies from 'universal-cookie';
 
-const fetchURL = 'http://localhost:8000/api';
+const fetchURL = 'https://fullstack-list-backend.onrender.com/api';
 
 const cookies = new Cookies();
 const token = cookies.get('TOKEN');
