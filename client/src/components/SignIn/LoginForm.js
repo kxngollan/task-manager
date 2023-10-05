@@ -5,7 +5,7 @@ import './SignIn.css';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
-fetchURL = 'https://fullstack-list-backend.onrender.com/login';
+const fetchURL = 'https://fullstack-list-backend.onrender.com/login';
 
 const LoginForm = (props) => {
   const [email, setEmail] = useState('');
