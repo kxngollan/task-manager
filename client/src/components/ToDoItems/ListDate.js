@@ -12,7 +12,6 @@ function ListDate(props) {
       className={
         taskStatus === 'Complete' ? 'list-date list-date-complete' : 'list-date'
       }
-      onClick={() => console.log(taskStatus)}
     >
       <div className="list-date-day">{day}</div>
       <div className="list-date-month">{month}</div>

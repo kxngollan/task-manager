@@ -5,6 +5,8 @@ import './SignIn.css';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
+fetchURL = 'https://fullstack-list-backend.onrender.com/login';
+
 const LoginForm = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +22,7 @@ const LoginForm = (props) => {
     event.preventDefault();
     const configuration = {
       method: 'post',
-      url: 'http://localhost:8000/login',
+      url: `${fetchURL}`,
       data: {
         email,
         password,
