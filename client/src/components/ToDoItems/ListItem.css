@@ -6,6 +6,7 @@
   padding: 0.5rem;
   background-color: #4b4b4b;
   border-radius: 12px;
+  max-width: 90%;
 }
 
 .list-item-complete {
