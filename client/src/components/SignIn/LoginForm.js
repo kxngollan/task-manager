@@ -70,14 +70,17 @@ const LoginForm = (props) => {
       <button className="signinbutton" type="submit">
         Login
       </button>
-      <Link to="/register">
-        <button className="signinbutton">Don't have an account</button>
-      </Link>
       {login ? (
         <p className="text-success">You Are Logged in Successfully</p>
       ) : (
         <p className="text-danger">You Are Not Logged in</p>
       )}
+      <Link to="/register">
+        <button className="signinbutton">Don't have an account</button>
+      </Link>
+      <Link to="/demo">
+        <button className="signinbutton">Try our Demo!</button>
+      </Link>
     </form>
   );
 };

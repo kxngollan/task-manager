@@ -25,3 +25,8 @@
   background-color: #fff;
   color: crimson;
 }
+
+.logout a {
+  text-decoration: none;
+  color: inherit;
+}

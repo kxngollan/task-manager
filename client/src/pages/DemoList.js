@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ListResults from '../components/ToDoItems/ListResults';
 import UserInput from '../components/UserInput/UserInput';
 import './ToDoList.css';
+import { Link } from 'react-router-dom';
 
 const DemoList = () => {
   const [tasks, setTasks] = useState([]);
@@ -38,6 +39,11 @@ const DemoList = () => {
   return (
     <div>
       <UserInput onAddTask={onSubmitHandler} />
+      <div className="logout">
+        <Link to="/">
+          <button>Login</button>
+        </Link>
+      </div>
       <div className="container">
         <ListResults
           tasks={sortedTasks}

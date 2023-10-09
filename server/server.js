@@ -3,10 +3,21 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import session from 'express-session';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 const MONGODB = process.env.MONGODBURL;
+
+app.set('trust proxy', 1); // trust first proxy
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true },
+  })
+);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
