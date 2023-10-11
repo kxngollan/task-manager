@@ -6,7 +6,7 @@ import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
 
-const fetchURL = 'https://fullstack-list-backend.onrender.com';
+const fetchURL = 'http://localhost:8000';
 
 const RegisterForm = (props) => {
   const [register, setRegister] = useState(false);

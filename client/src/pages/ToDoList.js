@@ -4,7 +4,7 @@ import UserInput from '../components/UserInput/UserInput';
 import './ToDoList.css';
 import Cookies from 'universal-cookie';
 
-const fetchURL = 'https://fullstack-list-backend.onrender.com/api';
+const fetchURL = 'http://localhost:8000';
 
 const cookies = new Cookies();
 const token = cookies.get('TOKEN');
@@ -19,7 +19,7 @@ const UserData = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${fetchURL}/user?email=${token.email}`);
+      const response = await fetch(`${fetchURL}/fetchitems/user`);
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
@@ -52,7 +52,7 @@ const UserData = () => {
   const onSubmitHandler = async (task) => {
     console.log(task);
     try {
-      const response = await fetch(`${fetchURL}/add`, {
+      const response = await fetch(`${fetchURL}/additems`, {
         method: 'POST',
         body: JSON.stringify(task),
         headers: {
@@ -75,7 +75,7 @@ const UserData = () => {
   // Delete an item
   const onDeleteItemHandler = async (taskId) => {
     try {
-      const response = await fetch(`${fetchURL}/delete`, {
+      const response = await fetch(`${fetchURL}/deleteitems`, {
         method: 'DELETE',
         headers: {
           'content-type': 'application/json',
@@ -95,7 +95,7 @@ const UserData = () => {
   // Update item status
   const onUpdateItemHandler = async (taskStatus, taskId) => {
     try {
-      const response = await fetch(`${fetchURL}/update`, {
+      const response = await fetch(`${fetchURL}/updateitemstatus`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -114,9 +114,16 @@ const UserData = () => {
     }
   };
 
-  const logout = () => {
-    cookies.remove('TOKEN', { path: '/' });
-    window.location.href = '/';
+  const logout = async () => {
+    try {
+      const response = await fetch(`${fetchURL}/logout`);
+      if (!response.ok) {
+        throw new Error('Something went wrong!');
+      }
+      window.location.href = '/';
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   return (

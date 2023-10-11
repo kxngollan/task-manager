@@ -9,13 +9,22 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 const MONGODB = process.env.MONGODBURL;
 
-app.set('trust proxy', 1); // trust first proxy
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
   cors({
     origin: '*',
     methods: 'GET,PUT,POST,DELETE',
+  })
+);
+
+app.set('trust proxy', 1);
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true },
   })
 );
 
@@ -35,6 +44,7 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+// Register
 app.post('/register', async (req, res) => {
   const user = new User({
     email: req.body.email,
@@ -43,6 +53,7 @@ app.post('/register', async (req, res) => {
   user
     .save()
     .then(() => {
+      req.session.user = user;
       res.json({ user });
     })
     .catch((err) => {
@@ -50,23 +61,36 @@ app.post('/register', async (req, res) => {
     });
 });
 
+// Login
 app.post('/login', async (req, res) => {
   const loggedInUser = { email: req.body.email, password: req.body.password };
 
   User.findOne(loggedInUser)
     .then((user) => {
       if (!user) {
-        res.status(401).json({ message: 'failed to authenticate' });
+        res.status(401).json({ message: 'Failed to authenticate' });
         return;
       }
 
-      if (user) {
-        res.json({ user });
-      }
+      req.session.user = user;
+      res.json({ user });
+      console.log(user);
     })
     .catch((err) => {
       res.status(500).json({ message: err.toString() });
     });
+});
+
+// Logout
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    } else {
+      res.status(200).json({ message: 'Logged out successfully' });
+    }
+  });
 });
 
 const listSchema = new mongoose.Schema({
@@ -81,19 +105,18 @@ const listSchema = new mongoose.Schema({
 const List = mongoose.model('List', listSchema);
 
 // Fetch all items
-app.get('/api/user', (req, res) => {
-  const email = req.query.email;
+app.get('/fetchitems/user', (req, res) => {
+  const user = req.session.user;
+  console.log('Session user set:', user);
+  if (!req.session.user) {
+    return res
+      .status(403)
+      .json({ message: 'Only logged in user can access this route' });
+  }
 
-  User.findOne({ email: email })
-    .then((user) => {
-      if (!user) {
-        return res
-          .status(403)
-          .json({ message: 'Only logged in user can access this route' });
-      }
+  const email = req.session.user.email;
 
-      return List.find({ email: email });
-    })
+  List.find({ email: email })
     .then((allItems) => {
       res.send(allItems);
     })
@@ -103,7 +126,7 @@ app.get('/api/user', (req, res) => {
 });
 
 // Add a new item
-app.post('/api/add', async (req, res) => {
+app.post('/additems', async (req, res) => {
   try {
     const { email, title, description, date, id, status } = req.body;
     const newListItem = new List({
@@ -128,7 +151,7 @@ app.post('/api/add', async (req, res) => {
 });
 
 // Delete an item
-app.delete('/api/delete', async (req, res) => {
+app.delete('/deleteitems', async (req, res) => {
   try {
     const itemId = req.body.id;
 
@@ -148,7 +171,7 @@ app.delete('/api/delete', async (req, res) => {
 });
 
 // Update item status
-app.put('/api/update', async (req, res) => {
+app.put('/updateitemstatus', async (req, res) => {
   try {
     const { status, id } = req.body;
     const newStatus = status === 'Pending' ? 'Complete' : 'Pending';
