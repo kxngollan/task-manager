@@ -14,15 +14,23 @@ const UserData = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  //Fetch all Task from Express
+  //Fetch all Task
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${fetchURL}/fetchitems/user`);
+      const response = await fetch(`${fetchURL}/fetchitems`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: token,
+      });
+
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
+
       const data = await response.json();
 
       const myList = Object.keys(data).map((key) => ({

@@ -1,16 +1,32 @@
-import 'dotenv/config';
-import express from 'express';
-import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import session from 'express-session';
-
+const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 8000;
-const MONGODB = process.env.MONGODBURL;
+require('dotenv').config();
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const session = require('express-session');
+const mongoose = require('mongoose');
+const MongoDBStore = require('connect-mongodb-session')(session);
 
+// Databse
+const dbConnect = require('./database/dbconnect');
+const User = require('./database/userModel');
+const List = require('./database/listModel');
+
+// Connect to DB
+dbConnect();
+
+const store = new MongoDBStore({
+  url: process.env.MONGOURL,
+  connection: 'session',
+});
+
+const signin = require('./routes/signin');
+
+//Body Parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+
+//CORS
 app.use(
   cors({
     origin: '*',
@@ -18,71 +34,21 @@ app.use(
   })
 );
 
+//Express Sessions
 app.set('trust proxy', 1);
 app.use(
   session({
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true },
+    saveUninitialized: false,
+    store: store,
   })
 );
 
-mongoose.connect(MONGODB, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: [true, 'Please provide an Email!'],
-    unique: [true, 'Email Exist'],
-  },
-  password: String,
-});
-
-const User = mongoose.model('User', userSchema);
-
-// Register
-app.post('/register', async (req, res) => {
-  const user = new User({
-    email: req.body.email,
-    password: req.body.password,
-  });
-  user
-    .save()
-    .then(() => {
-      req.session.user = user;
-      res.json({ user });
-    })
-    .catch((err) => {
-      res.status(500).json({ message: err.toString() });
-    });
-});
-
-// Login
-app.post('/login', async (req, res) => {
-  const loggedInUser = { email: req.body.email, password: req.body.password };
-
-  User.findOne(loggedInUser)
-    .then((user) => {
-      if (!user) {
-        res.status(401).json({ message: 'Failed to authenticate' });
-        return;
-      }
-
-      req.session.user = user;
-      res.json({ user });
-      console.log(user);
-    })
-    .catch((err) => {
-      res.status(500).json({ message: err.toString() });
-    });
-});
+app.use(signin);
 
 // Logout
-app.get('/logout', (req, res) => {
+app.get('/logout', (req, res, next) => {
   req.session.destroy((err) => {
     if (err) {
       console.error('Error destroying session:', err);
@@ -93,19 +59,8 @@ app.get('/logout', (req, res) => {
   });
 });
 
-const listSchema = new mongoose.Schema({
-  email: String,
-  title: String,
-  description: String,
-  date: String,
-  id: String,
-  status: String,
-});
-
-const List = mongoose.model('List', listSchema);
-
 // Fetch all items
-app.get('/fetchitems/user', (req, res) => {
+app.get('/fetchitems/user', (req, res, next) => {
   const user = req.session.user;
   console.log('Session user set:', user);
   if (!req.session.user) {
@@ -126,7 +81,7 @@ app.get('/fetchitems/user', (req, res) => {
 });
 
 // Add a new item
-app.post('/additems', async (req, res) => {
+app.post('/additems', async (req, res, next) => {
   try {
     const { email, title, description, date, id, status } = req.body;
     const newListItem = new List({
@@ -151,7 +106,7 @@ app.post('/additems', async (req, res) => {
 });
 
 // Delete an item
-app.delete('/deleteitems', async (req, res) => {
+app.delete('/deleteitems', async (req, res, next) => {
   try {
     const itemId = req.body.id;
 
@@ -171,7 +126,7 @@ app.delete('/deleteitems', async (req, res) => {
 });
 
 // Update item status
-app.put('/updateitemstatus', async (req, res) => {
+app.put('/updateitemstatus', async (req, res, next) => {
   try {
     const { status, id } = req.body;
     const newStatus = status === 'Pending' ? 'Complete' : 'Pending';
@@ -190,6 +145,12 @@ app.put('/updateitemstatus', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.use((req, res, next) => {
+  res.status(404).send('<h1>404 Page not found</h1>');
+});
+
+const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
