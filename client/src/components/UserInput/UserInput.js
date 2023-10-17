@@ -38,7 +38,12 @@ const UserInput = (props) => {
   };
 
   return (
-    <form className="listuserinput" onSubmit={formSubmissionHandler}>
+    <form
+      className="listuserinput"
+      onSubmit={formSubmissionHandler}
+      name="Todolist"
+      id="Todolist"
+    >
       <div className="input-item">
         <label>Date:</label>
         <input

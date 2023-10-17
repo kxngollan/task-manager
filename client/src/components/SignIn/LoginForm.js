@@ -1,50 +1,57 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import './SignIn.css';
+import fetchURL from '../fetchURL';
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
-
-const fetchURL = 'http://localhost:8000';
 
 const LoginForm = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [login, setLogin] = useState(false);
+
   const emailChangeHandler = (event) => {
     setEmail(event.target.value);
   };
+
   const passwordChangeHandler = (event) => {
     setPassword(event.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const configuration = {
-      method: 'post',
-      url: `${fetchURL}/login`,
-      data: {
-        email,
-        password,
-      },
-    };
 
-    axios(configuration)
-      .then((result) => {
-        cookies.set('TOKEN', result.data.user, {
-          path: '/',
-        });
-        window.location.href = '/todolist';
-        setLogin(true);
-      })
-      .catch((error) => {
-        error = new Error();
+    try {
+      const response = await fetch(`${fetchURL}/login`, {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+        headers: { 'content-type': 'application/json' },
       });
+
+      if (!response.ok) {
+        throw new Error('Something went wrong!');
+      }
+
+      const data = await response.json();
+
+      const user = data.user;
+
+      console.log('Data from response is:', user);
+
+      cookies.set('TOKEN', user, {
+        path: '/',
+      });
+      setLogin(true);
+
+      window.location.href = '/todolist';
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
-    <form className="signin" onSubmit={handleSubmit}>
+    <form className="signin" onSubmit={handleSubmit} id="login-form">
       <div className="signinform">
         <label htmlFor="email">Email:</label>
         <input
@@ -75,6 +82,7 @@ const LoginForm = (props) => {
       ) : (
         <p className="text-danger">You Are Not Logged in</p>
       )}
+
       <Link to="/register">
         <button className="signinbutton">Don't have an account</button>
       </Link>

@@ -29,8 +29,9 @@ app.use(express.json());
 //CORS
 app.use(
   cors({
-    origin: '*',
+    origin: 'http://localhost:3000',
     methods: 'GET,PUT,POST,DELETE',
+    credentials: true,
   })
 );
 
@@ -38,10 +39,13 @@ app.use(
 app.set('trust proxy', 1);
 app.use(
   session({
-    secret: process.env.SECRET,
+    secret: 'secret',
     resave: false,
-    saveUninitialized: false,
-    store: store,
+    saveUninitialized: true,
+    cookie: {
+      sameSite: 'none',
+      secure: true,
+    },
   })
 );
 
@@ -60,10 +64,10 @@ app.get('/logout', (req, res, next) => {
 });
 
 // Fetch all items
-app.get('/fetchitems/user', (req, res, next) => {
+app.get('/fetchitems', (req, res, next) => {
   const user = req.session.user;
   console.log('Session user set:', user);
-  if (!req.session.user) {
+  if (!user) {
     return res
       .status(403)
       .json({ message: 'Only logged in user can access this route' });

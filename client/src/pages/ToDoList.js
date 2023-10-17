@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ListResults from '../components/ToDoItems/ListResults';
 import UserInput from '../components/UserInput/UserInput';
-import './ToDoList.css';
 import Cookies from 'universal-cookie';
-
-const fetchURL = 'http://localhost:8000';
+import './ToDoList.css';
+import fetchURL from '../components/fetchURL';
 
 const cookies = new Cookies();
 const token = cookies.get('TOKEN');
@@ -21,10 +20,10 @@ const UserData = () => {
     try {
       const response = await fetch(`${fetchURL}/fetchitems`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: token,
       });
 
       if (!response.ok) {
@@ -58,7 +57,6 @@ const UserData = () => {
   }, [fetchData]);
   // Add a new item
   const onSubmitHandler = async (task) => {
-    console.log(task);
     try {
       const response = await fetch(`${fetchURL}/additems`, {
         method: 'POST',

@@ -18,6 +18,7 @@ route.post('/register', async (req, res, next) => {
       res.json({ user });
     })
     .catch((err) => {
+      console.log(err);
       res.status(500).json({ message: err.toString() });
     });
 });
@@ -25,16 +26,13 @@ route.post('/register', async (req, res, next) => {
 // Login
 route.post('/login', async (req, res, next) => {
   const loggedInUser = { email: req.body.email, password: req.body.password };
-
   User.findOne(loggedInUser)
     .then((user) => {
       if (!user) {
         res.status(401).json({ message: 'Failed to authenticate' });
         return;
       }
-
       res.json({ user });
-      console.log(user);
     })
     .catch((err) => {
       res.status(500).json({ message: err.toString() });

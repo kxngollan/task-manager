@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './SignIn.css';
-import axios from 'axios';
+import fetchURL from '../fetchURL';
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
-
-const fetchURL = 'http://localhost:8000';
 
 const RegisterForm = (props) => {
   const [register, setRegister] = useState(false);
@@ -38,36 +36,40 @@ const RegisterForm = (props) => {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (password !== password2) {
       return console.log("Password doesn't match");
     } else {
-      const configuration = {
-        method: 'post',
-        url: `${fetchURL}/register`,
-        data: {
-          email,
-          password,
-        },
-      };
-
-      axios(configuration)
-        .then((result) => {
-          setRegister(true);
-          cookies.set('TOKEN', result.data.user, {
-            path: '/',
-          });
-          window.location.href = '/todolist';
-        })
-        .catch((error) => {
-          error = new Error();
+      try {
+        const response = await fetch(`${fetchURL}/register`, {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
+
+        if (!response.ok) {
+          throw new Error('Something went wrong!');
+        }
+
+        const data = await response.json();
+
+        const user = data.user;
+
+        cookies.set('TOKEN', user, { path: '/' });
+
+        setRegister(true); // Set register state to true
+        window.location.href = '/todolist';
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
   return (
-    <form className="signin" onSubmit={handleSubmit}>
+    <form className="signin" onSubmit={handleSubmit} id="register-form">
       <div className="signinform">
         <label htmlFor="email">Email:</label>
         <input
