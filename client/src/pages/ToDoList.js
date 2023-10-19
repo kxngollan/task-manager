@@ -60,6 +60,7 @@ const UserData = () => {
     try {
       const response = await fetch(`${fetchURL}/additems`, {
         method: 'POST',
+        credentials: 'include',
         body: JSON.stringify(task),
         headers: {
           'content-type': 'application/json',
@@ -83,6 +84,7 @@ const UserData = () => {
     try {
       const response = await fetch(`${fetchURL}/deleteitems`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           'content-type': 'application/json',
         },
@@ -103,6 +105,7 @@ const UserData = () => {
     try {
       const response = await fetch(`${fetchURL}/updateitemstatus`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },

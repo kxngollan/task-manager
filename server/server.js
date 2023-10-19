@@ -1,8 +1,13 @@
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
+
 const express = require('express');
 const app = express();
+
+const cors = require('cors');
 require('dotenv').config();
 const bodyParser = require('body-parser');
-const cors = require('cors');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const MongoDBStore = require('connect-mongodb-session')(session);
@@ -43,8 +48,10 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
+      httpOnly: true,
       sameSite: 'none',
       secure: true,
+      maxAge: 3600000,
     },
   })
 );
@@ -73,7 +80,7 @@ app.get('/fetchitems', (req, res, next) => {
       .json({ message: 'Only logged in user can access this route' });
   }
 
-  const email = req.session.user.email;
+  const email = user.email;
 
   List.find({ email: email })
     .then((allItems) => {
@@ -156,6 +163,19 @@ app.use((req, res, next) => {
 
 const PORT = process.env.PORT || 8000;
 
-app.listen(PORT, () => {
+http.createServer(app).listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+// Only run an HTTPS server if we're not in production, otherwise we're expecting production to provide the HTTPS capabilities
+if (process.env.NODE_ENV != 'production') {
+  const HTTPS_PORT = process.env.HTTPS_PORT || 8443;
+  const options = {
+    key: fs.readFileSync(`./tls/server.key`),
+    cert: fs.readFileSync(`./tls/server.cert`),
+  };
+
+  https.createServer(options, app).listen(HTTPS_PORT, () => {
+    console.log(`HTTPS server is running on port ${HTTPS_PORT}`);
+  });
+}

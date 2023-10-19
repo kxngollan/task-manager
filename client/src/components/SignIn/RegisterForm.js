@@ -44,6 +44,7 @@ const RegisterForm = (props) => {
       try {
         const response = await fetch(`${fetchURL}/register`, {
           method: 'POST',
+          credentials: 'include',
           body: JSON.stringify({ email, password }),
           headers: {
             'Content-Type': 'application/json',

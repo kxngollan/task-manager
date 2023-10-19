@@ -32,9 +32,13 @@ route.post('/login', async (req, res, next) => {
         res.status(401).json({ message: 'Failed to authenticate' });
         return;
       }
+      req.session.user = user;
+      console.log(req.session.user);
+
       res.json({ user });
     })
     .catch((err) => {
+      console.log(err);
       res.status(500).json({ message: err.toString() });
     });
 });

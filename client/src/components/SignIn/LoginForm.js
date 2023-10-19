@@ -25,6 +25,7 @@ const LoginForm = (props) => {
     try {
       const response = await fetch(`${fetchURL}/login`, {
         method: 'POST',
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
         headers: { 'content-type': 'application/json' },
       });
