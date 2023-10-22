@@ -10,7 +10,7 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const mongoose = require('mongoose');
-// const MongoDBStore = require('connect-mongodb-session')(session);
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 // Databse
 const dbConnect = require('./database/dbconnect');
@@ -19,10 +19,10 @@ const List = require('./database/listModel');
 // Connect to DB
 dbConnect();
 
-// const store = new MongoDBStore({
-//   url: process.env.MONGOURL,
-//   connection: 'session',
-// });
+const store = new MongoDBStore({
+  url: process.env.MONGOURL,
+  connection: 'session',
+});
 
 const signin = require('./routes/signin');
 
@@ -34,7 +34,7 @@ app.use(express.json());
 // This clear CORS err
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: process.env.SITE,
     methods: 'GET,PUT,POST,DELETE',
     credentials: true,
   })
@@ -47,6 +47,7 @@ app.use(
     secret: 'secret',
     resave: false,
     saveUninitialized: true,
+    store: store,
     cookie: {
       httpOnly: true,
       sameSite: 'none',
@@ -94,14 +95,14 @@ app.get('/fetchitems', (req, res, next) => {
 // Add a new item
 app.post('/additems', async (req, res, next) => {
   try {
-    const { email, title, description, date, id, status } = req.body;
+    const { email, title, description, date, id, listStatus } = req.body;
     const newListItem = new List({
       email: email,
       title: title,
       description: description,
       date: date,
       id: id,
-      status: status,
+      status: listStatus,
     });
 
     const newListItemId = newListItem.id;

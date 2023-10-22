@@ -8,10 +8,10 @@ const ListItem = (props) => {
   };
 
   const onUpdate = () => {
-    props.updateHandler(props.myStatus, props.id);
+    props.updateHandler(props.listStatus, props.id);
   };
 
-  const taskStatus = props.myStatus;
+  const taskStatus = props.listStatus;
 
   return (
     <div
@@ -31,7 +31,7 @@ const ListItem = (props) => {
             : 'list-item-action'
         }
       >
-        <button onClick={onUpdate}>{props.myStatus}</button>
+        <button onClick={onUpdate}>{props.listStatus}</button>
         <button onClick={onDelete}>Delete</button>
       </div>
     </div>
