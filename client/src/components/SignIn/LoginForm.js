@@ -19,9 +19,18 @@ const LoginForm = (props) => {
     setPassword(event.target.value);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const demoLogin = () => {
+    setEmail('demo@demo.com');
+    setPassword('Demo123');
+    submission();
+  };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    submission();
+  };
+
+  const submission = async () => {
     try {
       const response = await fetch(`${fetchURL}/login`, {
         method: 'POST',
@@ -38,8 +47,6 @@ const LoginForm = (props) => {
 
       const user = data.user;
 
-      console.log('Data from response is:', user);
-
       cookies.set('TOKEN', user, {
         path: '/',
       });
@@ -53,6 +60,10 @@ const LoginForm = (props) => {
 
   return (
     <form className="signin" onSubmit={handleSubmit} id="login-form">
+      <div className="signinform">
+        <h1>Your To Do List</h1>
+        <h2>Login</h2>
+      </div>
       <div className="signinform">
         <label htmlFor="email">Email:</label>
         <input
@@ -87,9 +98,10 @@ const LoginForm = (props) => {
       <Link to="/register">
         <button className="signinbutton">Don't have an account</button>
       </Link>
-      <Link to="/demo">
-        <button className="signinbutton">Try our Demo!</button>
-      </Link>
+
+      <button className="signinbutton" onClick={demoLogin}>
+        Try our Demo!
+      </button>
     </form>
   );
 };

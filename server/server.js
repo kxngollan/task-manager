@@ -10,20 +10,19 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const mongoose = require('mongoose');
-const MongoDBStore = require('connect-mongodb-session')(session);
+// const MongoDBStore = require('connect-mongodb-session')(session);
 
 // Databse
 const dbConnect = require('./database/dbconnect');
-const User = require('./database/userModel');
 const List = require('./database/listModel');
 
 // Connect to DB
 dbConnect();
 
-const store = new MongoDBStore({
-  url: process.env.MONGOURL,
-  connection: 'session',
-});
+// const store = new MongoDBStore({
+//   url: process.env.MONGOURL,
+//   connection: 'session',
+// });
 
 const signin = require('./routes/signin');
 
@@ -32,6 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 //CORS
+// This clear CORS err
 app.use(
   cors({
     origin: 'http://localhost:3000',

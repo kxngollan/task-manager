@@ -1,18 +1,21 @@
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import ToDoList from './pages/ToDoList';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import DemoList from './pages/DemoList';
-
-const routers = createBrowserRouter([
-  { path: '/', element: <Login /> },
-  { path: '/register', element: <Register /> },
-  { path: '/todolist', element: <ToDoList /> },
-  { path: '/demo', element: <DemoList /> },
-]);
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
-  return <RouterProvider router={routers} />;
+  return (
+    <Router>
+      <Routes>
+        <Route element={<ProtectedRoute />}>
+          <Route element={<ToDoList />} path="/todolist" />
+        </Route>
+        <Route element={<Login />} path="/" />
+        <Route element={<Register />} path="/register" />
+      </Routes>
+    </Router>
+  );
 };
 
 export default App;

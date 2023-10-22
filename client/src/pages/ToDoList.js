@@ -118,6 +118,7 @@ const UserData = () => {
       }
 
       fetchData();
+      console.log('updated');
     } catch (error) {
       setError(error.message);
     }
@@ -125,7 +126,14 @@ const UserData = () => {
 
   const logout = async () => {
     try {
-      const response = await fetch(`${fetchURL}/logout`);
+      cookies.remove('TOKEN', { path: '/' });
+      const response = await fetch(`${fetchURL}/logout`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }

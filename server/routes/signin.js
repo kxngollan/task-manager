@@ -33,8 +33,6 @@ route.post('/login', async (req, res, next) => {
         return;
       }
       req.session.user = user;
-      console.log(req.session.user);
-
       res.json({ user });
     })
     .catch((err) => {

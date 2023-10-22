@@ -72,6 +72,10 @@ const RegisterForm = (props) => {
   return (
     <form className="signin" onSubmit={handleSubmit} id="register-form">
       <div className="signinform">
+        <h1>Your To Do List</h1>
+        <h2>Register</h2>
+      </div>
+      <div className="signinform">
         <label htmlFor="email">Email:</label>
         <input
           type="email"
