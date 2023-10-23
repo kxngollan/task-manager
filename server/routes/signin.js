@@ -41,4 +41,27 @@ route.post('/login', async (req, res, next) => {
     });
 });
 
+//Check to see if user logged in
+route.get('/checkLogin', (req, res) => {
+  if (req.session.user) {
+    res.json({ authenticated: true });
+    console.log('Logged In');
+  } else {
+    res.json({ authenticated: false });
+    console.log('Logged Out');
+  }
+});
+
+// Logout
+route.get('/logout', (req, res, next) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    } else {
+      res.status(200).json({ message: 'Logged out successfully' });
+    }
+  });
+});
+
 module.exports = route;

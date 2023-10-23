@@ -1,12 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ListResults from '../components/ToDoItems/ListResults';
 import UserInput from '../components/UserInput/UserInput';
-import Cookies from 'universal-cookie';
+
 import './ToDoList.css';
 import fetchURL from '../components/fetchURL';
-
-const cookies = new Cookies();
-const token = cookies.get('TOKEN');
 
 const UserData = () => {
   const [tasks, setTasks] = useState([]);
@@ -55,6 +52,7 @@ const UserData = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
   // Add a new item
   const onSubmitHandler = async (task) => {
     try {
@@ -126,7 +124,6 @@ const UserData = () => {
 
   const logout = async () => {
     try {
-      cookies.remove('TOKEN', { path: '/' });
       const response = await fetch(`${fetchURL}/logout`, {
         method: 'GET',
         credentials: 'include',
@@ -145,7 +142,7 @@ const UserData = () => {
 
   return (
     <div>
-      <UserInput onAddTask={onSubmitHandler} userEmail={token.email} />
+      <UserInput onAddTask={onSubmitHandler} />
       <div className="container">
         {!loading && (
           <ListResults

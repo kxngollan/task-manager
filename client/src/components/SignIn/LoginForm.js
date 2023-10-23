@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './SignIn.css';
 import fetchURL from '../fetchURL';
-import Cookies from 'universal-cookie';
-
-const cookies = new Cookies();
 
 const LoginForm = (props) => {
   const [email, setEmail] = useState('');
@@ -43,13 +40,6 @@ const LoginForm = (props) => {
         throw new Error('Something went wrong!');
       }
 
-      const data = await response.json();
-
-      const user = data.user;
-
-      cookies.set('TOKEN', user, {
-        path: '/',
-      });
       setLogin(true);
 
       window.location.href = '/todolist';

@@ -22,7 +22,6 @@ const UserInput = (props) => {
     event.preventDefault();
 
     const taskData = {
-      email: props.userEmail,
       title: myTask,
       date: theDate,
       description: myDescription,

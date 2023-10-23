@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './SignIn.css';
 import fetchURL from '../fetchURL';
-import Cookies from 'universal-cookie';
-
-const cookies = new Cookies();
 
 const RegisterForm = (props) => {
   const [register, setRegister] = useState(false);
@@ -54,12 +51,6 @@ const RegisterForm = (props) => {
         if (!response.ok) {
           throw new Error('Something went wrong!');
         }
-
-        const data = await response.json();
-
-        const user = data.user;
-
-        cookies.set('TOKEN', user, { path: '/' });
 
         setRegister(true); // Set register state to true
         window.location.href = '/todolist';
