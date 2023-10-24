@@ -57,10 +57,18 @@ app.use(
     },
   })
 );
-
 app.use(signin);
 
-app.use(listItems);
+const loggedIn = (req, res, next) => {
+  const user = req.session.user;
+  if (!user) {
+    res.status(401).json({ message: 'Not logged in' });
+  } else {
+    next();
+  }
+};
+
+app.use(loggedIn, listItems);
 
 const PORT = process.env.PORT || 8000;
 

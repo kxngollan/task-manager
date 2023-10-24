@@ -23,10 +23,12 @@ const UserData = () => {
         },
       });
 
-      if (!response.ok) {
+      if (!response) {
         throw new Error('Something went wrong!');
       }
-
+      if (response.status === 401) {
+        window.location.href = '/';
+      }
       const data = await response.json();
 
       const myList = Object.keys(data).map((key) => ({

@@ -15,7 +15,6 @@ route.post('/register', async (req, res, next) => {
     .save()
     .then(() => {
       req.session.user = user;
-      res.json({ user });
     })
     .catch((err) => {
       console.log(err);
@@ -33,23 +32,11 @@ route.post('/login', async (req, res, next) => {
         return;
       }
       req.session.user = user;
-      res.json({ user });
     })
     .catch((err) => {
       console.log(err);
       res.status(500).json({ message: err.toString() });
     });
-});
-
-//Check to see if user logged in
-route.get('/checkLogin', (req, res) => {
-  if (req.session.user) {
-    res.json({ authenticated: true });
-    console.log('Logged In');
-  } else {
-    res.json({ authenticated: false });
-    console.log('Logged Out');
-  }
 });
 
 // Logout
