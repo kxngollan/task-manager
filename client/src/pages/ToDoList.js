@@ -72,6 +72,10 @@ const UserData = () => {
         throw new Error(errorData.error || 'Failed to add task.');
       }
 
+      if (response.status === 401) {
+        window.location.href = '/';
+      }
+
       await response.json();
       fetchData();
     } catch (error) {
@@ -94,6 +98,11 @@ const UserData = () => {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to delete task.');
       }
+
+      if (response.status === 401) {
+        window.location.href = '/';
+      }
+
       fetchData();
     } catch (error) {
       setError(error.message);
@@ -117,8 +126,11 @@ const UserData = () => {
         throw new Error(errorData.error || 'Failed to update task.');
       }
 
+      if (response.status === 401) {
+        window.location.href = '/';
+      }
+
       fetchData();
-      console.log('updated');
     } catch (error) {
       setError(error.message);
     }
