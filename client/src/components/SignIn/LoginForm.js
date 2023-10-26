@@ -1,50 +1,61 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import './SignIn.css';
-import Cookies from 'universal-cookie';
-
-const cookies = new Cookies();
-
-const fetchURL = 'https://fullstack-list-backend.onrender.com/login';
+import fetchURL from '../fetchURL';
 
 const LoginForm = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [login, setLogin] = useState(false);
+
+  const navigate = useNavigate();
+
   const emailChangeHandler = (event) => {
     setEmail(event.target.value);
   };
+
   const passwordChangeHandler = (event) => {
     setPassword(event.target.value);
   };
 
+  const demoLogin = () => {
+    setEmail('demo@demo.com');
+    setPassword('Demo123');
+    submission();
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const configuration = {
-      method: 'post',
-      url: `${fetchURL}`,
-      data: {
-        email,
-        password,
-      },
-    };
+    submission();
+  };
 
-    axios(configuration)
-      .then((result) => {
-        cookies.set('TOKEN', result.data.user, {
-          path: '/',
-        });
-        window.location.href = '/todolist';
-        setLogin(true);
-      })
-      .catch((error) => {
-        error = new Error();
+  const submission = async () => {
+    try {
+      const response = await fetch(`${fetchURL}/login`, {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+        headers: { 'content-type': 'application/json' },
       });
+
+      if (!response.ok) {
+        throw new Error('Something went wrong!');
+      }
+
+      setLogin(true);
+
+      return navigate('/todolist');
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
-    <form className="signin" onSubmit={handleSubmit}>
+    <form className="signin" onSubmit={handleSubmit} id="login-form">
+      <div className="signinform">
+        <h1>Your To Do List</h1>
+        <h2>Login</h2>
+      </div>
       <div className="signinform">
         <label htmlFor="email">Email:</label>
         <input
@@ -75,12 +86,14 @@ const LoginForm = (props) => {
       ) : (
         <p className="text-danger">You Are Not Logged in</p>
       )}
+
       <Link to="/register">
         <button className="signinbutton">Don't have an account</button>
       </Link>
-      <Link to="/demo">
-        <button className="signinbutton">Try our Demo!</button>
-      </Link>
+
+      <button className="signinbutton" onClick={demoLogin}>
+        Try our Demo!
+      </button>
     </form>
   );
 };

@@ -22,7 +22,6 @@ const UserInput = (props) => {
     event.preventDefault();
 
     const taskData = {
-      email: props.userEmail,
       title: myTask,
       date: theDate,
       description: myDescription,
@@ -38,7 +37,12 @@ const UserInput = (props) => {
   };
 
   return (
-    <form className="listuserinput" onSubmit={formSubmissionHandler}>
+    <form
+      className="listuserinput"
+      onSubmit={formSubmissionHandler}
+      name="Todolist"
+      id="Todolist"
+    >
       <div className="input-item">
         <label>Date:</label>
         <input

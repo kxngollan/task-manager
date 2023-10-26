@@ -1,173 +1,92 @@
-import 'dotenv/config';
-import express from 'express';
-import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import session from 'express-session';
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
 
+const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 8000;
-const MONGODB = process.env.MONGODBURL;
 
-app.set('trust proxy', 1); // trust first proxy
+const cors = require('cors');
+require('dotenv').config();
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const mongoose = require('mongoose');
+const MongoDBStore = require('connect-mongodb-session')(session);
+
+// Databse
+const dbConnect = require('./database/dbconnect');
+const List = require('./database/listModel');
+
+// Connect to DB
+dbConnect();
+
+const store = new MongoDBStore({
+  url: process.env.MONGOURL,
+  connection: 'session',
+});
+
+const signin = require('./routes/signin');
+const listItems = require('./routes/listItems');
+
+//Body Parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+
+//CORS
+// This clear CORS err
 app.use(
   cors({
-    origin: '*',
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
     methods: 'GET,PUT,POST,DELETE',
+    credentials: true,
   })
 );
 
-mongoose.connect(MONGODB, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+//Express Sessions
+app.set('trust proxy', 1);
+app.use(
+  session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    store: store,
+    cookie: {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+      maxAge: 3600000,
+    },
+  })
+);
+app.use(signin);
 
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: [true, 'Please provide an Email!'],
-    unique: [true, 'Email Exist'],
-  },
-  password: String,
-});
-
-const User = mongoose.model('User', userSchema);
-
-app.post('/register', async (req, res) => {
-  const user = new User({
-    email: req.body.email,
-    password: req.body.password,
-  });
-  user
-    .save()
-    .then(() => {
-      res.json({ user });
-    })
-    .catch((err) => {
-      res.status(500).json({ message: err.toString() });
-    });
-});
-
-app.post('/login', async (req, res) => {
-  const loggedInUser = { email: req.body.email, password: req.body.password };
-
-  User.findOne(loggedInUser)
-    .then((user) => {
-      if (!user) {
-        res.status(401).json({ message: 'failed to authenticate' });
-        return;
-      }
-
-      if (user) {
-        res.json({ user });
-      }
-    })
-    .catch((err) => {
-      res.status(500).json({ message: err.toString() });
-    });
-});
-
-const listSchema = new mongoose.Schema({
-  email: String,
-  title: String,
-  description: String,
-  date: String,
-  id: String,
-  status: String,
-});
-
-const List = mongoose.model('List', listSchema);
-
-// Fetch all items
-app.get('/api/user', (req, res) => {
-  const email = req.query.email;
-
-  User.findOne({ email: email })
-    .then((user) => {
-      if (!user) {
-        return res
-          .status(403)
-          .json({ message: 'Only logged in user can access this route' });
-      }
-
-      return List.find({ email: email });
-    })
-    .then((allItems) => {
-      res.send(allItems);
-    })
-    .catch((error) => {
-      res.status(500).json({ message: error.message });
-    });
-});
-
-// Add a new item
-app.post('/api/add', async (req, res) => {
-  try {
-    const { email, title, description, date, id, status } = req.body;
-    const newListItem = new List({
-      email: email,
-      title: title,
-      description: description,
-      date: date,
-      id: id,
-      status: status,
-    });
-
-    const newListItemId = newListItem.id;
-
-    await newListItem.save();
-
-    console.log('Item added to ToDoList: ' + newListItemId);
-    res.status(201).json({ message: 'Item added successfully:' });
-  } catch (error) {
-    console.error('Error adding to List:', error);
-    res.status(500).json({ error: 'Internal server error' });
+const loggedIn = (req, res, next) => {
+  const user = req.session.user;
+  if (!user) {
+    res.status(401).json({ message: 'Not logged in' });
+  } else {
+    next();
   }
-});
+};
 
-// Delete an item
-app.delete('/api/delete', async (req, res) => {
-  try {
-    const itemId = req.body.id;
+app.use(loggedIn, listItems);
 
-    const listDelete = await List.deleteOne({ id: itemId }).exec();
+const PORT = process.env.PORT || 8000;
 
-    if (listDelete.deletedCount === 1) {
-      console.log('Item deleted:', itemId);
-      res.status(200).json({ message: 'Item deleted successfully' });
-    } else {
-      console.log('Item not found:', itemId);
-      res.status(404).json({ error: 'Item not found' });
-    }
-  } catch (error) {
-    console.error('Error deleting item:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Update item status
-app.put('/api/update', async (req, res) => {
-  try {
-    const { status, id } = req.body;
-    const newStatus = status === 'Pending' ? 'Complete' : 'Pending';
-
-    const ListUpdate = await List.updateOne({ id: id }, { status: newStatus });
-
-    if (ListUpdate.modifiedCount === 1) {
-      console.log('Update successful');
-      res.status(204).end();
-    } else {
-      console.log('No document was modified');
-      res.status(200).json({ message: 'No document was modified' });
-    }
-  } catch (error) {
-    console.error('Error updating item:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-app.listen(PORT, () => {
+http.createServer(app).listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+// Only run an HTTPS server if we're not in production, otherwise we're expecting production to provide the HTTPS capabilities
+if (process.env.NODE_ENV != 'production') {
+  const HTTPS_PORT = process.env.HTTPS_PORT || 8443;
+  const options = {
+    key: fs.readFileSync(`./tls/server.key`),
+    cert: fs.readFileSync(`./tls/server.cert`),
+  };
+
+  https.createServer(options, app).listen(HTTPS_PORT, () => {
+    console.log(`HTTPS server is running on port ${HTTPS_PORT}`);
+  });
+}

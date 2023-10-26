@@ -1,27 +1,36 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ListResults from '../components/ToDoItems/ListResults';
 import UserInput from '../components/UserInput/UserInput';
+
 import './ToDoList.css';
-import Cookies from 'universal-cookie';
-
-const fetchURL = 'https://fullstack-list-backend.onrender.com/api';
-
-const cookies = new Cookies();
-const token = cookies.get('TOKEN');
+import fetchURL from '../components/fetchURL';
+import { useNavigate } from 'react-router-dom';
 
 const UserData = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  //Fetch all Task from Express
+  const navigate = useNavigate();
+
+  //Fetch all Task
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${fetchURL}/user?email=${token.email}`);
-      if (!response.ok) {
+      const response = await fetch(`${fetchURL}/fetchitems`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response) {
         throw new Error('Something went wrong!');
+      }
+      if (response.status === 401) {
+        navigate('/');
       }
       const data = await response.json();
 
@@ -43,17 +52,18 @@ const UserData = () => {
       setLoading(false);
       setError(error.message);
     }
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
   // Add a new item
   const onSubmitHandler = async (task) => {
-    console.log(task);
     try {
-      const response = await fetch(`${fetchURL}/add`, {
+      const response = await fetch(`${fetchURL}/additems`, {
         method: 'POST',
+        credentials: 'include',
         body: JSON.stringify(task),
         headers: {
           'content-type': 'application/json',
@@ -63,6 +73,10 @@ const UserData = () => {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to add task.');
+      }
+
+      if (response.status === 401) {
+        navigate('/');
       }
 
       await response.json();
@@ -75,8 +89,9 @@ const UserData = () => {
   // Delete an item
   const onDeleteItemHandler = async (taskId) => {
     try {
-      const response = await fetch(`${fetchURL}/delete`, {
+      const response = await fetch(`${fetchURL}/deleteitems`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           'content-type': 'application/json',
         },
@@ -86,6 +101,11 @@ const UserData = () => {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to delete task.');
       }
+
+      if (response.status === 401) {
+        navigate('/');
+      }
+
       fetchData();
     } catch (error) {
       setError(error.message);
@@ -95,8 +115,9 @@ const UserData = () => {
   // Update item status
   const onUpdateItemHandler = async (taskStatus, taskId) => {
     try {
-      const response = await fetch(`${fetchURL}/update`, {
+      const response = await fetch(`${fetchURL}/updateitemstatus`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -108,20 +129,37 @@ const UserData = () => {
         throw new Error(errorData.error || 'Failed to update task.');
       }
 
+      if (response.status === 401) {
+        navigate('/');
+      }
+
       fetchData();
     } catch (error) {
       setError(error.message);
     }
   };
 
-  const logout = () => {
-    cookies.remove('TOKEN', { path: '/' });
-    window.location.href = '/';
+  const logout = async () => {
+    try {
+      const response = await fetch(`${fetchURL}/logout`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Something went wrong!');
+      }
+      navigate('/');
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   return (
     <div>
-      <UserInput onAddTask={onSubmitHandler} userEmail={token.email} />
+      <UserInput onAddTask={onSubmitHandler} />
       <div className="container">
         {!loading && (
           <ListResults

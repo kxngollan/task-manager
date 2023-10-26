@@ -16,6 +16,10 @@ div .signin {
   display: block;
 }
 
+.signinform h1 {
+  text-align: center;
+}
+
 div .signinform input {
   width: 100%;
   padding: 12px 20px;

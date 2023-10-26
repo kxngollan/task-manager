@@ -12,7 +12,7 @@ const ListResults = (props) => {
           <ListItem
             key={task.id}
             id={task.id}
-            myStatus={task.listStatus}
+            listStatus={task.listStatus}
             date={new Date(task.date)}
             title={task.title}
             description={task.description}
