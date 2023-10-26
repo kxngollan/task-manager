@@ -54,7 +54,7 @@ const RegisterForm = (props) => {
           throw new Error('Something went wrong!');
         }
 
-        setRegister(true); // Set register state to true
+        setRegister(true);
         navigate('/todolist');
       } catch (error) {
         console.log(error);
