@@ -15,6 +15,7 @@ route.post('/register', async (req, res, next) => {
     .save()
     .then(() => {
       req.session.user = user;
+      res.status(200).send();
     })
     .catch((err) => {
       console.log(err);
