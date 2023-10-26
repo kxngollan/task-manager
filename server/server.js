@@ -35,7 +35,9 @@ app.use(express.json());
 // This clear CORS err
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
     methods: 'GET,PUT,POST,DELETE',
     credentials: true,
   })
