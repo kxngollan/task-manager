@@ -35,9 +35,7 @@ app.use(express.json());
 // This clear CORS err
 app.use(
   cors({
-    origin: (origin, callback) => {
-      callback(null, true);
-    },
+    origin: 'https://astonishing-kashata-33428c.netlify.app/',
     methods: 'GET,PUT,POST,DELETE',
     credentials: true,
   })
