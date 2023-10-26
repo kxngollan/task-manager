@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './SignIn.css';
 import fetchURL from '../fetchURL';
 
@@ -9,6 +9,8 @@ const RegisterForm = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
+
+  const navigate = useNavigate();
 
   const emailChangeHandler = (event) => {
     setEmail(event.target.value);
@@ -53,7 +55,7 @@ const RegisterForm = (props) => {
         }
 
         setRegister(true); // Set register state to true
-        window.location.href = '/todolist';
+        navigate('/todolist');
       } catch (error) {
         console.log(error);
       }

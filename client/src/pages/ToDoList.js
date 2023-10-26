@@ -4,11 +4,14 @@ import UserInput from '../components/UserInput/UserInput';
 
 import './ToDoList.css';
 import fetchURL from '../components/fetchURL';
+import { useNavigate } from 'react-router-dom';
 
 const UserData = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   //Fetch all Task
   const fetchData = useCallback(async () => {
@@ -27,7 +30,7 @@ const UserData = () => {
         throw new Error('Something went wrong!');
       }
       if (response.status === 401) {
-        window.location.href = '/';
+        navigate('/');
       }
       const data = await response.json();
 
@@ -49,7 +52,7 @@ const UserData = () => {
       setLoading(false);
       setError(error.message);
     }
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     fetchData();
@@ -73,7 +76,7 @@ const UserData = () => {
       }
 
       if (response.status === 401) {
-        window.location.href = '/';
+        navigate('/');
       }
 
       await response.json();
@@ -100,7 +103,7 @@ const UserData = () => {
       }
 
       if (response.status === 401) {
-        window.location.href = '/';
+        navigate('/');
       }
 
       fetchData();
@@ -127,7 +130,7 @@ const UserData = () => {
       }
 
       if (response.status === 401) {
-        window.location.href = '/';
+        navigate('/');
       }
 
       fetchData();
@@ -148,7 +151,7 @@ const UserData = () => {
       if (!response.ok) {
         throw new Error('Something went wrong!');
       }
-      window.location.href = '/';
+      navigate('/');
     } catch (error) {
       setError(error.message);
     }

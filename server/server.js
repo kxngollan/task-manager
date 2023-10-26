@@ -35,7 +35,7 @@ app.use(express.json());
 // This clear CORS err
 app.use(
   cors({
-    origin: process.env.SITE,
+    origin: 'http://localhost:3000',
     methods: 'GET,PUT,POST,DELETE',
     credentials: true,
   })
