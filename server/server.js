@@ -19,8 +19,10 @@ const List = require('./database/listModel');
 // Connect to DB
 dbConnect();
 
+const MONGODB = process.env.MONGODBURL;
+
 const store = new MongoDBStore({
-  url: process.env.MONGOURL,
+  url: MONGODB,
   connection: 'session',
 });
 
@@ -35,7 +37,9 @@ app.use(express.json());
 // This clear CORS err
 app.use(
   cors({
-    origin: 'https://astonishing-kashata-33428c.netlify.app/',
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
     methods: 'GET,PUT,POST,DELETE',
     credentials: true,
   })
@@ -57,6 +61,7 @@ app.use(
     },
   })
 );
+
 app.use(signin);
 
 const loggedIn = (req, res, next) => {
