@@ -21,11 +21,6 @@ dbConnect();
 
 const MONGODB = process.env.MONGODBURL;
 
-const store = new MongoDBStore({
-  url: MONGODB,
-  connection: 'session',
-});
-
 const signin = require('./routes/signin');
 const listItems = require('./routes/listItems');
 
@@ -52,7 +47,6 @@ app.use(
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
-    store: store,
     cookie: {
       httpOnly: true,
       sameSite: 'none',
