@@ -19,7 +19,18 @@ const List = require('./database/listModel');
 // Connect to DB
 dbConnect();
 
+// MongoDB Store
 const MONGODB = process.env.MONGODBURL;
+
+const MONGODBstore = new MongoDBStore({
+  uri: MONGODB,
+  collection: 'sessions',
+  expires: 1000 * 60 * 60 * 24 * 7,
+});
+
+MONGODBstore.on('error', (error) => {
+  console.error(error);
+});
 
 const signin = require('./routes/signin');
 const listItems = require('./routes/listItems');
@@ -47,6 +58,7 @@ app.use(
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
+    store: MONGODBstore,
     cookie: {
       httpOnly: true,
       sameSite: 'none',
