@@ -6,7 +6,7 @@ import fetchURL from '../fetchURL';
 const LoginForm = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [login, setLogin] = useState(false);
+  const [login, setLogin] = useState(true);
 
   const navigate = useNavigate();
 
@@ -78,13 +78,13 @@ const LoginForm = (props) => {
           value={password}
         />
       </div>
-      <button className="signinbutton" type="submit">
-        Login
-      </button>
+
       {login ? (
-        <p className="text-success">You Are Logged in Successfully</p>
+        <button className="signinbutton" type="submit">
+          Login
+        </button>
       ) : (
-        <p className="text-danger">You Are Not Logged in</p>
+        <p className="text-success">Logging In...</p>
       )}
 
       <Link to="/register">

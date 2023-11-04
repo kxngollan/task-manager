@@ -4,7 +4,7 @@ import './SignIn.css';
 import fetchURL from '../fetchURL';
 
 const RegisterForm = (props) => {
-  const [register, setRegister] = useState(false);
+  const [register, setRegister] = useState(true);
   const [match, setMatch] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,7 +37,9 @@ const RegisterForm = (props) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setRegister(false);
     if (password !== password2) {
+      setRegister(true);
       return console.log("Password doesn't match");
     } else {
       try {
@@ -58,6 +60,7 @@ const RegisterForm = (props) => {
         navigate('/todolist');
       } catch (error) {
         console.log(error);
+        setRegister(true);
       }
     }
   };
@@ -100,25 +103,24 @@ const RegisterForm = (props) => {
           onChange={password2ChangeHandler}
           value={password2}
         />
-        {!match ? (
-          <p className="text-danger">Passwords don't match</p>
-        ) : (
-          <p className="text-success">Passwords match</p>
-        )}
+        {password.length > 0 &&
+          password2.length > 0 &&
+          (match ? (
+            <p className="text-success">Passwords match</p>
+          ) : (
+            <p className="text-danger">Passwords don't match</p>
+          ))}
       </div>
-      <button className="signinbutton" type="submit">
-        Register
-      </button>
+      {register ? (
+        <button className="signinbutton" type="submit">
+          Register
+        </button>
+      ) : (
+        <p className="text-success">Registering</p>
+      )}
       <Link to="/">
         <button className="signinbutton">Already have an account</button>
       </Link>
-      {register ? (
-        <p className="text-success">
-          You Are Registered Successfully now go to login
-        </p>
-      ) : (
-        <p className="text-danger">You Are Not Registered please try again</p>
-      )}
     </form>
   );
 };
