@@ -9,27 +9,13 @@ const cors = require('cors');
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const mongoose = require('mongoose');
-const MongoDBStore = require('connect-mongodb-session')(session);
+const pg = require('pg');
 
-// Databse
-const dbConnect = require('./database/dbconnect');
-const List = require('./database/listModel');
+//Databasw
+const db = require('./database/dbconnect');
 
 // Connect to DB
-dbConnect();
-
-const MONGODB = process.env.MONGODBURL;
-
-const MONGODBstore = new MongoDBStore({
-  uri: MONGODB,
-  collection: 'sessions',
-  expires: 1000 * 60 * 60 * 24 * 7,
-});
-
-MONGODBstore.on('error', (error) => {
-  console.error(error);
-});
+const client = db();
 
 const signin = require('./routes/signin');
 const listItems = require('./routes/listItems');
@@ -57,7 +43,6 @@ app.use(
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
-    store: MONGODBstore,
     cookie: {
       httpOnly: true,
       sameSite: 'none',

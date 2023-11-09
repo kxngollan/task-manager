@@ -1,12 +1,12 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { Pool } = require('pg');
+
+const db = require('../database/dbconnect');
 
 const route = express.Router();
 
-const List = require('../database/listModel');
-
 // Fetch all items
-route.get('/fetchitems', (req, res, next) => {
+route.get('/fetchitems', async (req, res, next) => {
   const user = req.session.user;
   if (!user) {
     return res
@@ -16,35 +16,35 @@ route.get('/fetchitems', (req, res, next) => {
 
   const email = req.session.user.email;
 
-  List.find({ email: email })
-    .then((allItems) => {
-      res.send(allItems);
-    })
-    .catch((error) => {
-      res.status(500).json({ message: error.message });
-    });
+  try {
+    const result = await pool.query('SELECT * FROM list WHERE email = $1', [
+      email,
+    ]);
+    const allItems = result.rows;
+    res.send(allItems);
+  } catch (error) {
+    console.error('Error fetching items:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Add a new item
 route.post('/additems', async (req, res, next) => {
   const email = req.session.user.email;
+
   try {
     const { title, description, date, id, listStatus } = req.body;
-    const newListItem = new List({
-      email: email,
-      title: title,
-      description: description,
-      date: date,
-      id: id,
-      status: listStatus,
-    });
+    id = key;
+    const query = `
+      INSERT INTO list (email, title, description, date, key, status)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `;
+    const values = [email, title, description, date, key, listStatus];
 
-    const newListItemId = newListItem.id;
+    await pool.query(query, values);
 
-    await newListItem.save();
-
-    console.log('Item added to ToDoList: ' + newListItemId);
-    res.status(201).json({ message: 'Item added successfully:' });
+    console.log('Item added to ToDoList: ' + id);
+    res.status(201).json({ message: 'Item added successfully' });
   } catch (error) {
     console.error('Error adding to List:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -56,9 +56,9 @@ route.delete('/deleteitems', async (req, res, next) => {
   try {
     const itemId = req.body.id;
 
-    const listDelete = await List.deleteOne({ id: itemId }).exec();
+    const result = await pool.query('DELETE FROM list WHERE id = $1', [itemId]);
 
-    if (listDelete.deletedCount === 1) {
+    if (result.rowCount === 1) {
       console.log('Item deleted:', itemId);
       res.status(200).json({ message: 'Item deleted successfully' });
     } else {
@@ -77,9 +77,12 @@ route.put('/updateitemstatus', async (req, res, next) => {
     const { status, id } = req.body;
     const newStatus = status === 'Pending' ? 'Complete' : 'Pending';
 
-    const ListUpdate = await List.updateOne({ id: id }, { status: newStatus });
+    const result = await pool.query(
+      'UPDATE list SET status = $1 WHERE id = $2',
+      [newStatus, id]
+    );
 
-    if (ListUpdate.modifiedCount === 1) {
+    if (result.rowCount === 1) {
       console.log('Update successful');
       res.status(204).end();
     } else {
