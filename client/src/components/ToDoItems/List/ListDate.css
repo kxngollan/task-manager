@@ -1,0 +1,30 @@
+.list-date {
+  display: flex;
+  flex-direction: column;
+  width: 5.5rem;
+  height: 5.5rem;
+  border: 1px solid #ececec;
+  background-color: #2a2a2a;
+  color: white;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.list-date-complete {
+  background-color: #1a571c !important;
+}
+
+.list-date-month {
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.list-date-year {
+  font-size: 0.75rem;
+}
+
+.list-date-day {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
