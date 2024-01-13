@@ -5,10 +5,7 @@ const MONGODB = process.env.MONGODBURL;
 
 const dbConnect = () => {
   mongoose
-    .connect(MONGODB, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
+    .connect(MONGODB)
     .then(() => {
       console.log('Successfully connected to MongoDB Atlas!');
     })

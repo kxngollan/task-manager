@@ -5,8 +5,8 @@ const listSchema = new mongoose.Schema({
   title: String,
   description: String,
   date: String,
-  id: String,
-  status: String,
+  listId: String,
+  listStatus: String,
 });
 
 module.exports = mongoose.model('List', listSchema);

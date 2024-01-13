@@ -2,19 +2,18 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 
+const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
 
 const cors = require('cors');
 require('dotenv').config();
-const bodyParser = require('body-parser');
 const session = require('express-session');
-const mongoose = require('mongoose');
+
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 // Databse
 const dbConnect = require('./database/dbconnect');
-const List = require('./database/listModel');
 
 // Connect to DB
 dbConnect();
@@ -25,9 +24,8 @@ const MONGODB = process.env.MONGODBURL;
 const MONGODBstore = new MongoDBStore({
   uri: MONGODB,
   collection: 'sessions',
-  expires: 1000 * 60 * 60 * 24 * 7,
+  expires: 1000 * 60 * 60,
 });
-
 MONGODBstore.on('error', (error) => {
   console.error(error);
 });
@@ -37,10 +35,9 @@ const listItems = require('./routes/listItems');
 
 //Body Parser
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(bodyParser.json());
 
 //CORS
-// This clear CORS err
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -63,29 +60,16 @@ app.use(
       httpOnly: true,
       sameSite: 'none',
       secure: true,
-      maxAge: 3600000,
+      maxAge: 1000 * 60 * 60 * 24,
     },
   })
 );
 
-app.use(signin);
+app.use('/signin', signin);
 
-const loggedIn = (req, res, next) => {
-  const user = req.session.user;
-  if (!user) {
-    res.status(401).json({ message: 'Not logged in' });
-  } else {
-    next();
-  }
-};
-
-app.use(loggedIn, listItems);
+app.use('/list', listItems);
 
 const PORT = process.env.PORT || 8000;
-
-http.createServer(app).listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
 
 // Only run an HTTPS server if we're not in production, otherwise we're expecting production to provide the HTTPS capabilities
 if (process.env.NODE_ENV != 'production') {
@@ -97,5 +81,9 @@ if (process.env.NODE_ENV != 'production') {
 
   https.createServer(options, app).listen(HTTPS_PORT, () => {
     console.log(`HTTPS server is running on port ${HTTPS_PORT}`);
+  });
+} else {
+  http.createServer(app).listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
   });
 }

@@ -1,94 +1,95 @@
 const express = require('express');
-const mongoose = require('mongoose');
-
 const route = express.Router();
 
+const mongoose = require('mongoose');
 const List = require('../database/listModel');
 
-// Fetch all items
-route.get('/fetchitems', (req, res, next) => {
-  const user = req.session.user;
-  if (!user) {
-    return res
-      .status(403)
-      .json({ message: 'Only logged in user can access this route' });
+// Check token for protected routes.
+const { tokenCheck } = require('../util/auth');
+
+route.use(tokenCheck);
+
+// Fetch all lists items from database
+route.get('/fetchitems', async (req, res, next) => {
+  try {
+    const user = req.session.user;
+    const email = user.email;
+    const lists = await List.find({ email: email });
+    const sorted = [...lists].sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
+    res.status(201).send(sorted);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
   }
+});
 
-  const email = req.session.user.email;
-
-  List.find({ email: email })
-    .then((allItems) => {
-      res.send(allItems);
-    })
-    .catch((error) => {
-      res.status(500).json({ message: error.message });
+// Add items to list
+route.post('/additem', async (req, res, next) => {
+  try {
+    const { title, description, date, listId } = req.body;
+    console.log(title, description, date, listId);
+    const user = req.session.user;
+    const email = user.email;
+    const list = new List({
+      title,
+      description,
+      date,
+      email,
+      listId,
+      listStatus: 'Pending',
     });
+    await list.save();
+    res.status(201).send({ message: 'Item added successfully', listId });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
 });
 
-// Add a new item
-route.post('/additems', async (req, res, next) => {
-  const email = req.session.user.email;
+// Delete item from list
+route.delete('/deleteitem', async (req, res, next) => {
+  body = req.body;
+  console.log(body);
   try {
-    const { title, description, date, id, listStatus } = req.body;
-    const newListItem = new List({
-      email: email,
-      title: title,
-      description: description,
-      date: date,
-      id: id,
-      status: listStatus,
+    const listId = req.body.listId;
+
+    console.log(listId);
+
+    if (!listId) {
+      return res
+        .status(400)
+        .send({ error: 'Missing listId in the request body.' });
+    }
+
+    const deleteResult = await List.deleteOne({
+      email: req.session.user.email,
+      listId: listId,
     });
 
-    const newListItemId = newListItem.id;
+    if (deleteResult.deletedCount === 0) {
+      return res.status(404).send({ error: 'Item not found or not deleted.' });
+    }
 
-    await newListItem.save();
-
-    console.log('Item added to ToDoList: ' + newListItemId);
-    res.status(201).json({ message: 'Item added successfully:' });
-  } catch (error) {
-    console.error('Error adding to List:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(204).end();
+  } catch (err) {
+    console.error('Error deleting item:', err);
+    res.status(500).send({ error: 'Internal Server Error.' });
   }
 });
 
-// Delete an item
-route.delete('/deleteitems', async (req, res, next) => {
+//Update item from list
+route.put('/updateitem', async (req, res, next) => {
   try {
-    const itemId = req.body.id;
+    const { listId, listStatus } = req.body;
+    const newStatus = listStatus === 'Pending' ? 'Complete' : 'Pending';
+    await List.updateOne(
+      { email: req.session.user.email, listId: listId },
+      { listStatus: newStatus }
+    );
 
-    const listDelete = await List.deleteOne({ id: itemId }).exec();
-
-    if (listDelete.deletedCount === 1) {
-      console.log('Item deleted:', itemId);
-      res.status(200).json({ message: 'Item deleted successfully' });
-    } else {
-      console.log('Item not found:', itemId);
-      res.status(404).json({ error: 'Item not found' });
-    }
-  } catch (error) {
-    console.error('Error deleting item:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Update item status
-route.put('/updateitemstatus', async (req, res, next) => {
-  try {
-    const { status, id } = req.body;
-    const newStatus = status === 'Pending' ? 'Complete' : 'Pending';
-
-    const ListUpdate = await List.updateOne({ id: id }, { status: newStatus });
-
-    if (ListUpdate.modifiedCount === 1) {
-      console.log('Update successful');
-      res.status(204).end();
-    } else {
-      console.log('No document was modified');
-      res.status(200).json({ message: 'No document was modified' });
-    }
-  } catch (error) {
-    console.error('Error updating item:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(201).send({ message: 'Item updated successfully', listId });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
   }
 });
 

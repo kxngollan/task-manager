@@ -1,55 +1,75 @@
 const express = require('express');
-const mongoose = require('mongoose');
-
 const route = express.Router();
 
+const mongoose = require('mongoose');
 const User = require('../database/userModel');
 
-// Register
-route.post('/register', async (req, res, next) => {
-  const user = new User({
-    email: req.body.email,
-    password: req.body.password,
-  });
-  user
-    .save()
-    .then(() => {
-      req.session.user = user;
-      res.status(200).send();
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ message: err.toString() });
+const bcrypt = require('bcrypt');
+const { createJSONToken } = require('../util/token');
+
+// Register for site
+route.post('/register', (req, res, next) => {
+  const { email, password } = req.body;
+  console.log(email, password);
+  User.findOne({ email }).then((user) => {
+    if (user) {
+      return res.status(422).json({ error: 'Email already exists' });
+    }
+    bcrypt.hash(password, 10, (err, hash) => {
+      if (err) {
+        return res.status(500).json({ error: err });
+      }
+      const user = new User({
+        email,
+        password: hash,
+      });
+      user
+        .save()
+        .then((result) => {
+          req.session.user = user;
+          const token = createJSONToken(email);
+          res.status(200).json({ message: 'Login successful', token });
+        })
+        .catch((err) => {
+          res.status(500).json({ error: err });
+          console.log(err);
+        });
     });
+  });
 });
 
-// Login
-route.post('/login', async (req, res, next) => {
-  const loggedInUser = { email: req.body.email, password: req.body.password };
-  User.findOne(loggedInUser)
+// Login for site
+route.post('/login', (req, res, next) => {
+  const { email, password } = req.body;
+  console.log(email, password);
+  User.findOne({ email })
     .then((user) => {
       if (!user) {
-        res.status(401).json({ message: 'Failed to authenticate' });
-        return;
+        return res.status(422).json({ error: 'Email not registered' });
       }
-      req.session.user = user;
-      res.status(200).send();
+      bcrypt.compare(password, user.password).then((isMatch) => {
+        if (!isMatch) {
+          return res.status(401).json({ error: 'Invalid email or password' });
+        }
+        const token = createJSONToken(email);
+        req.session.user = user;
+        res.status(200).json({ message: 'Login successful', token });
+      });
     })
     .catch((err) => {
+      res.status(500).json({ error: err });
       console.log(err);
-      res.status(500).json({ message: err.toString() });
+      return;
     });
 });
 
-// Logout
+// Logout of site
 route.get('/logout', (req, res, next) => {
   req.session.destroy((err) => {
     if (err) {
-      console.error('Error destroying session:', err);
-      res.status(500).json({ error: 'Internal server error' });
-    } else {
-      res.status(200).json({ message: 'Logged out successfully' });
+      console.log(err);
     }
+    return res.status(200).json({ message: 'Logout successful' });
   });
 });
 
