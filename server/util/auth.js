@@ -8,6 +8,13 @@ const validateJSONToken = async (token) => {
 
 // Check token for protected routes.
 const tokenCheck = (req, res, next) => {
+  if (!req.headers.authorization) {
+    console.log('Authorization header is missing');
+    return res
+      .status(401)
+      .json({ error: 'Unauthorized No Authorization Header' });
+  }
+
   const headers = req.headers.authorization.split(' ');
   const token = headers[1];
 
