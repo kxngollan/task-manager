@@ -61,3 +61,12 @@ div .signinform input {
   font-weight: 600;
   color: #4caf50;
 }
+
+.visibility {
+  background-color: inherit;
+  border: none;
+}
+
+.visibility:nth-last-child(1) {
+  margin-bottom: 16px;
+}

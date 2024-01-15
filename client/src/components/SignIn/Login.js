@@ -8,8 +8,18 @@ const LoginForm = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [visibility, setvisibility] = useState('password');
 
   const redirect = useNavigate();
+
+  const changeVis = () => {
+    if (visibility === 'password') {
+      setvisibility('text');
+    } else {
+      setvisibility('password');
+    }
+  };
 
   const emailChangeHandler = (event) => {
     setEmail(event.target.value);
@@ -32,6 +42,14 @@ const LoginForm = (props) => {
         },
       });
 
+      if (res.status === 401) {
+        throw new Error('Invalid email or password');
+      }
+
+      if (res.status === 422) {
+        throw new Error('Email not found');
+      }
+
       if (!res.ok) {
         throw new Error('Something went wrong!');
       }
@@ -47,6 +65,7 @@ const LoginForm = (props) => {
       return redirect('/todolist');
     } catch (error) {
       setLoading(false);
+      setError(error.message);
       console.log(error);
     }
   };
@@ -66,18 +85,23 @@ const LoginForm = (props) => {
           id="email"
           onChange={emailChangeHandler}
           value={email}
+          required
         />
       </div>
       <div className="signinform">
         <label htmlFor="password">Password:</label>
         <input
-          type="password"
+          type={visibility}
           name="password"
           placeholder="password"
           id="password"
           onChange={passwordChangeHandler}
           value={password}
+          required
         />
+        <button onClick={changeVis} type="button" className="visibility">
+          {visibility === 'password' ? 'Show password' : 'Hide password'}
+        </button>
       </div>
       {loading ? (
         <CircularProgress style={{ margin: '0 auto' }} />
@@ -86,6 +110,7 @@ const LoginForm = (props) => {
           <button className="signinbutton" type="submit">
             Login
           </button>
+          <p className="text-danger">{error}</p>
           <Link to="/register">
             <button className="signinbutton">Don't have an account</button>
           </Link>

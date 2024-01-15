@@ -49,7 +49,6 @@ route.post('/additem', async (req, res, next) => {
 // Delete item from list
 route.delete('/deleteitem', async (req, res, next) => {
   body = req.body;
-  console.log(body);
   try {
     const listId = req.body.listId;
 

@@ -6,15 +6,31 @@ const User = require('../database/userModel');
 
 const bcrypt = require('bcrypt');
 const { createJSONToken } = require('../util/token');
+const { passwordCheck } = require('../util/detailsCheck');
+const { emailCheck } = require('../util/detailsCheck');
 
 // Register for site
 route.post('/register', (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, password2 } = req.body;
   console.log(email, password);
   User.findOne({ email }).then((user) => {
     if (user) {
       return res.status(422).json({ error: 'Email already exists' });
     }
+
+    if (password !== password2) {
+      return res.status(401).json({ error: 'Passwords do not match' });
+    }
+    const passwordPassed = passwordCheck(password);
+    if (!passwordPassed) {
+      return res.status(401).json({ error: 'Invalid Password' });
+    }
+
+    const emailPassed = emailCheck(email);
+    if (emailPassed) {
+      return res.status(401).json({ error: 'Invalid Email' });
+    }
+
     bcrypt.hash(password, 10, (err, hash) => {
       if (err) {
         return res.status(500).json({ error: err });
