@@ -104,7 +104,9 @@ const LoginForm = (props) => {
         </button>
       </div>
       {loading ? (
-        <CircularProgress style={{ margin: '0 auto' }} />
+        <button className="signinbutton" type="submit">
+          <CircularProgress style={{ margin: '0 auto' }} />
+        </button>
       ) : (
         <>
           <button className="signinbutton" type="submit">

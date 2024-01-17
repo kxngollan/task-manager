@@ -250,7 +250,9 @@ const RegisterForm = (props) => {
           ))}
       </div>
       {loading ? (
-        <CircularProgress />
+        <button className="signinbutton" type="button">
+          <CircularProgress />
+        </button>
       ) : (
         <>
           <button className="signinbutton" type="submit">
