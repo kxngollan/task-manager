@@ -30,12 +30,12 @@ const List = () => {
         },
       });
 
-      if (!res.ok) {
-        throw new Error('Something went wrong!');
-      }
-
       if (res.status === 401) {
         return redirect('/');
+      }
+
+      if (!res.ok) {
+        throw new Error('Something went wrong!');
       }
 
       const data = await res.json();
